@@ -54,14 +54,6 @@
 		/>
 	</Player>
 	<Obstacle
-		dType="obj"
-		resource="res/cyl.obj"
-		T="7000,-3000,-2500"
-		R="0,0,0,1"
-		S="400,400,-400"
-		color="1,1,1,1"
-	/>
-	<Obstacle
 		dType="cube"
 		T="1500,-600,-2500"
 		R="0,0,0,1"

@@ -1,0 +1,1 @@
+cd build/; ./engineTest; cd ..
