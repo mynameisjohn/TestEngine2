@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<Entity atk="0.25,0,0.5,0.5">
+	<Collider soft="0.5">
+		<box S="2,1,.17" T="0,0,-5.88">
+			<rect S="1,.8" T="0,0" />
+			<rect S="1,.8" T="0,.8" />
+		</box>
+	</Collider>
+	<Skeleton T="0,0,0">
+		<drawable name="Q1" fileName="outline" type="t" T="0,.9,.005" S="2.3,.4,1">
+			<drawable name="Q2" fileName="outline" type="t" T="0,0,0" S=".4,1,1"/>
+			<drawable name="Q3" fileName="outline" type="t" T=".27,0,-.17" S=".4,1,1" R="60,0,1,0"/>
+			<drawable name="Q4" fileName="outline" type="t" T=".5,0,-.2" S=".5,1,1"/>
+			<drawable name="Q5" fileName="outline" type="t" T=".83,0,-.17" S=".4,1,1" R="60,0,-1,0"/>
+			<drawable name="Q6" fileName="outline" type="t" T="1.1,0,0" S="1.2,1,1"/>
+<!--
+			<drawable name="Q2" fileName="outline" type="t" T="0,0,0" S="2,4,1"/>
+			<drawable name="Q4" fileName="outline" type="t" T="1,1,-1" S="3,4,1"/>
+			<drawable name="Q5" fileName="outline" type="t" T="0,1,0" S="6,2,1" R="-60,0,1,0"/>
+			<drawable name="Q6" fileName="outline" type="t" T="0,1,0" S="5,4,1"/>
+-->
+		</drawable>
+	</Skeleton>
+</Entity>

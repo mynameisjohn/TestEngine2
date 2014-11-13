@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<rig id="body" C="1" S="1,1,1">
+	<cycle id = "stand" dt="0.002">
+		<pose>
+			<trans T="0,0,0" R="0,0,0,1"/>
+		</pose>
+		<pose>
+			<trans T="0,0,0" R="0,0,0,1"/>
+		</pose>
+	</cycle>
+	<cycle id = "walk" dt="0.02">
+		<pose>
+			<trans T="0,0,0" R="0,0,0,1"/>
+		</pose>
+		<pose>
+			<trans T="0,0,0" R="0,0,0,1"/>
+		</pose>
+	</cycle>
+	<cycle id = "run" dt="0.3">
+		<pose>
+			<trans T="0,0,0" R="-3,0,0,1"/>
+		</pose>
+		<pose>
+			<trans T="0,.03,0" R="-5,0,0,1"/>
+		</pose>
+	</cycle>
+</rig>

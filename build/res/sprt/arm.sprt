@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<spritesheet>
+	<sprite fileName = "arm.png" />
+	<sprite fileName = "arm_draw.png" />
+	<!--
+	<sprite fileName = "arm_bent.png" />
+	<sprite fileName = "arm_drawn.png" />-->
+</spritesheet>

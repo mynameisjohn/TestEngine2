@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<Entity atk="0.25,0,0.5,0.5">
+	<Collider soft="0.5">
+		<box S=".4,1.5,1" T="0,0,0">
+			<rect S=".3, .5" T="0,0" />
+			<rect S=".3, .5" T="0,0.4" />
+			<rect S=".3, .5" T="0,0.8" />
+		</box>
+	</Collider>
+	<Skeleton T="0,0,0">
+		<drawable name="body" fileName="body" type="r" T="0,.5,0" S=".9,1,1">
+			<drawable name="leg1" fileName="leg" type="r" T=".02,0,-.02" S=".7,.8,1"/>
+			<drawable name="leg2" fileName="leg" type="r" T=".135,0,-.04" S=".7,.8,1" shift="1"/>
+			<drawable name="arm1" fileName="arm" type="r" T=".03,.93,.02" S=".2,.3,1">
+				<drawable name="forearm1" fileName="forearm" type="r" T=".032,.58,.022" S=".32,.36,1"/>
+			</drawable>
+			<drawable name="arm2" fileName="arm" type="r" T=".15,.88,-.05" S=".2,.3,1" shift="1">
+				<drawable name="forearm2" fileName="forearm" type="r" T=".152,.58,-.047" S=".32,.36,1">
+					<drawable name="bow" fileName="bow" type="t" T=".12,.2,-.045" S=".16,1,1" R="-90,0,0,1"/>
+				</drawable>
+			</drawable>
+<!--
+			<drawable name="arm1" fileName="arm" type="r" T="-.072,.95,-.02" S=".2,.2,1">
+				<drawable name="forearm" fileName="forearm" type="r" T="-.067,.769,-.022" S=".3,.3,1"/>
+			</drawable>
+			<drawable name="arm2" fileName="arm" type="r" T=".05,1,.02" S=".2,.2,.025" shift="1">
+				<drawable name="forearm2" fileName="forearm" type="r" T=".06,.83,.027" S=".3,.3,1">
+					<drawable name="bow" fileName="bow" type="t" T="-.3,0,.026" S=".7,.7,1"/>
+				</drawable>
+			</drawable>
+-->
+<!--
+			<drawable name="arm2" fileName="arm" type="r" T="0,0,0" S=".16,1,1" shift="1">
+				<drawable name="bow" fileName="bow" type="t" T="0,0,0" S="2,2,2"/>
+			</drawable>
+			<drawable name="leg1" fileName="leg" type="r" T="0,0,0" S=".3,1,1"/>
+			<drawable name="leg2" fileName="leg" type="r" shift="1" T="0,0,0"/>-->
+		</drawable>
+	</Skeleton>
+</Entity>
