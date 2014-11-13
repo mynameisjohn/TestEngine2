@@ -1,2 +1,2 @@
-#run cmake, enter build, run make, return to src
-cmake .; cd build/; make -j12; cd ..;
+#enter build, run cmake, run make, return to src
+cd build/; cmake ..; make -j12; cd ..;
