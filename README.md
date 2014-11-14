@@ -1,5 +1,5 @@
 An updated version of the Test Engine. This represents the groundwork for a larger project I hope to start soon. 
-It's the beginning of a simple gameengine using C++ and OpenGL. At the moment the following is working:
+It's the beginning of a simple game engine using C++ and OpenGL. At the moment the following is working:
 
 - 3D Collision (hard and soft)
 - Texture Mapping

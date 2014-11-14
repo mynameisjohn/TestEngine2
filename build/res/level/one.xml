@@ -55,10 +55,10 @@
 	</Player>
 	<Obstacle
 		dType="obj"
-		resource="res/obj/dice.obj"
-		T="7000,-3000,-2500"
+		resource="res/obj/lil_gah.obj"
+		T="7000,-4000,-2500"
 		R="180,0,1,0"
-		S="400,400,-400"
+		S="1000,400,-400"
 		color="0,1,1,1"
 	/>
 	<Obstacle
