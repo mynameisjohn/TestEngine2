@@ -37,6 +37,7 @@ unsigned int fromImage(string fileName){
    //Unbind, Delete the host texture, return handle to device texture
 	glBindTexture(GL_TEXTURE_2D, 0);
    SDL_FreeSurface(s);
+	
    return (unsigned int)tex;
 }
 

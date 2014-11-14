@@ -25,7 +25,6 @@ Skeleton Closet::createSkeleton(TiXmlElement * skeleton, JShader& shader){
    if (root){
 		vector<Ligament> lVec;
 		unordered_map<string, int> nameMap;
-		cout << "Calling fill" << endl;
 		fill(lVec, nameMap, root, shader);
 		Skeleton s(nameMap, lVec);
 
@@ -51,7 +50,6 @@ int Closet::fill(vector<Ligament>& lVec, unordered_map<string, int>& nameMap, Ti
 
 	for (TiXmlElement * i = el->FirstChildElement("drawable"); i; i=i->NextSiblingElement("drawable"))
 		lVec[curIdx].addChild(fill(lVec, nameMap, i, shader) - curIdx);
-	cout << name << "\t" << curIdx << endl;
 
 	return curIdx;
 }

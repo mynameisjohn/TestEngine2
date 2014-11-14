@@ -25,30 +25,6 @@
 		S="600,600,-2"
 		color="1,0,0,1"
 	/>
-	<Obstacle dbg="0"
-		dType="skeleton"
-		resource="storefront.xml"
-		T="2000,-400,-3000"
-		R="0,0,0,1"
-		S="1000,1000,1000"
-		color="1,1,1,1"
-	/>
-	<Obstacle
-		dType="skeleton"
-		resource="storefront.xml"
-		T="4500,-400,-3000"
-		R="0,0,0,1"
-		S="1000,1000,1000"
-		color="1,1,1,1"
-	/>
-	<Obstacle
-		dType="skeleton"
-		resource="storefront.xml"
-		T="-500,-400,-3000"
-		R="0,0,0,1"
-		S="1000,1000,1000"
-		color="1,1,1,1"
-	/>
 -->
 <Level>
 	<Seeker dbg="0"
@@ -78,6 +54,14 @@
 		/>
 	</Player>
 	<Obstacle
+		dType="obj"
+		resource="res/obj/dice.obj"
+		T="7000,-3000,-2500"
+		R="180,0,1,0"
+		S="400,400,-400"
+		color="0,1,1,1"
+	/>
+	<Obstacle
 		dType="cube"
 		T="1500,-600,-2500"
 		R="0,0,0,1"
@@ -89,6 +73,30 @@
 		T="-1000,-800,-1000"
 		R="0,0,0,1"
 		S="8000,200,-3000"
+		color="1,1,1,1"
+	/>
+	<Obstacle dbg="0"
+		dType="skeleton"
+		resource="storefront.xml"
+		T="2000,-400,-3000"
+		R="0,0,0,1"
+		S="1000,1000,1000"
+		color="1,1,1,1"
+	/>
+	<Obstacle
+		dType="skeleton"
+		resource="storefront.xml"
+		T="4500,-400,-3000"
+		R="0,0,0,1"
+		S="1000,1000,1000"
+		color="1,1,1,1"
+	/>
+	<Obstacle
+		dType="skeleton"
+		resource="storefront.xml"
+		T="-500,-400,-3000"
+		R="0,0,0,1"
+		S="1000,1000,1000"
 		color="1,1,1,1"
 	/>
 	<Obstacle

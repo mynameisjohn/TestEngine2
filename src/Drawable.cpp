@@ -56,7 +56,7 @@ void Drawable::draw(string currentTex){//, vec4 color){
 	glUniform1i(mShader->getModeHandle(), mMode);
 
 	glBindVertexArray(mVAO); //Bind my VAO
-	glDrawElements(GL_TRIANGLE_STRIP, mElementCount, GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_TRIANGLES, mElementCount, GL_UNSIGNED_INT, NULL);
 }
 
 int Drawable::getNumElems(){

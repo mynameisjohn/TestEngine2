@@ -75,7 +75,7 @@ void Rig::draw(string currentTex, bool rigged){
    }
 
    glBindVertexArray(mVAO); //Bind my VAO
-   glDrawElements(GL_TRIANGLE_STRIP, mElementCount, GL_UNSIGNED_INT, NULL);
+   glDrawElements(GL_TRIANGLES, mElementCount, GL_UNSIGNED_INT, NULL);
 }
 
 mat4 Rig::draw(mat4 parentMV, vec2& u, unsigned int from, unsigned int to, string currentTex){//, vec4 color){
