@@ -65,7 +65,6 @@ void Collider::scale(vec3 s){
 		rectIt->moveTo(vec2(s)*diff);
 	}
 	soft *= max(s);
-	cout << soft << endl;
 /*
 	float x(300);
 	soft = glm::vec2(getPos().z-(x-getDim().z)/2,getDim().z+(x-getDim().z)/2);

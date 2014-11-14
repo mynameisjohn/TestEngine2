@@ -46,14 +46,12 @@ unique_ptr<Population> Soup::createPopulation(string levelFile, JShader& shader)
 				seekVec.emplace_back(e);
 				float h;
 				stringstream(el->Attribute("health")) >> h;
-				cout << h << endl;
 				seekVec.back().setHealth(h);
 			}
 			if (type == "Player"){
 				player = Player(e);
 				float h;
 				stringstream(el->Attribute("health")) >> h;
-				cout << h << endl;
 				player.setHealth(h);
 				if (el->FirstChildElement("Projectile")){
 					TiXmlElement * projEl = el->FirstChildElement("Projectile");
@@ -216,7 +214,7 @@ Collider getCollider(TiXmlElement * collider){
 	vector<BoundRect> recVec;
 
 	stringstream(collider->Attribute("soft")) >> soft;
-	cout << soft << endl;
+	
 	for (TiXmlElement * box=collider->FirstChildElement("box"); box; box=box->NextSiblingElement("box")){
 		vec3 dim, tr;
 		string in = box->Attribute("S");
@@ -227,7 +225,7 @@ Collider getCollider(TiXmlElement * collider){
 			in.erase(0,pos+d.length());
 		}
 		fillVec(tr,box->Attribute("T"));
-		cout << tr << endl;
+		
 		bb = BoundBox(tr,dim);
 		for (TiXmlElement  * rect=box->FirstChildElement("rect"); rect; rect=rect->NextSiblingElement("rect")){
 			vec2 rDim, rTr;

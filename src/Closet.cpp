@@ -25,6 +25,7 @@ Skeleton Closet::createSkeleton(TiXmlElement * skeleton, JShader& shader){
    if (root){
 		vector<Ligament> lVec;
 		unordered_map<string, int> nameMap;
+		cout << "Calling fill" << endl;
 		fill(lVec, nameMap, root, shader);
 		Skeleton s(nameMap, lVec);
 
@@ -38,7 +39,6 @@ Skeleton Closet::createSkeleton(TiXmlElement * skeleton, JShader& shader){
 
 int Closet::fill(vector<Ligament>& lVec, unordered_map<string, int>& nameMap, TiXmlElement * el, JShader& shader){
    string name = el->Attribute("name");
-
 	if (nameMap.find(name) != nameMap.end()){
 		cout << "Cycle created in Ligament map: " << name << " already exists. \n Segfault Imminent." << endl;
 		return 0;
@@ -51,6 +51,7 @@ int Closet::fill(vector<Ligament>& lVec, unordered_map<string, int>& nameMap, Ti
 
 	for (TiXmlElement * i = el->FirstChildElement("drawable"); i; i=i->NextSiblingElement("drawable"))
 		lVec[curIdx].addChild(fill(lVec, nameMap, i, shader) - curIdx);
+	cout << name << "\t" << curIdx << endl;
 
 	return curIdx;
 }
@@ -84,7 +85,6 @@ Ligament Closet::createLigament(TiXmlElement * el, JShader& shader){
 		switch (type){
 			case 'r':
 				drPtr = unique_ptr<Drawable>(new Rig(initRigFromSVG(fileName, shader)));
-				cout << drPtr->getOrigins().front() << endl;
 				break;
 			case 't':
 				drPtr = unique_ptr<Drawable>(new Drawable(initTexQuad(shader, fileName)));

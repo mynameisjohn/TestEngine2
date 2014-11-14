@@ -8,4 +8,5 @@ git add  tinyxml/CMakeLists.txt \
 			*.sh \
 			README.md \
 			src/*.cpp \
-			include/*.h
+			include/*.h \
+			*.cmake

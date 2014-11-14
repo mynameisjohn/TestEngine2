@@ -77,6 +77,8 @@ void Seeker::addPotential(Entity * e){
 			
 			mSkel["arm2"]->set_to(to, state);
 			mSkel["arm1"]->set_to(to, state);
+			mSkel["leg2"]->set_to(to, state);
+			mSkel["leg1"]->set_to(to, state);
 		}
 	}
 }
