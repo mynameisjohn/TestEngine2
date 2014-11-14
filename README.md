@@ -14,9 +14,9 @@ The next big step is to work on art and music.
 
 INSTRUCTIONS (for linux/unix based systems):
 
-0. Install SDL2(with the image/mixer libraries), GLEW, and ensure you have the OpenGL libraries. Also get CMake 2.8 or greater.
 1. Clone this repository. 
-2. Enter the build directory, and type
+2. Install SDL2(with the image/mixer libraries), GLEW, and ensure you have the OpenGL libraries. Also get CMake 2.8 or greater, and copy the files in CMakeModules to the Modules directory of CMake (/usr/share/cmake-2.8/Modules for me)
+3. Enter the build directory, and type
 	- cmake ..; make
 	or use the makeIt shell script, which was designed for my machine that has 8 cores to compile on. 
-3. run engineTest from within the build directory
+4. run engineTest from within the build directory
