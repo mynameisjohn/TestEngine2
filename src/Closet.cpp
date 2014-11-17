@@ -1,6 +1,6 @@
 #include "Util.h"
 #include "Closet.h"
-#include "glm/gtx/transform.hpp"
+#include <glm/gtx/transform.hpp>
 
 //The constructor, which ensures that the cube and drawables exist by default
 Closet::Closet(unordered_map<string, unique_ptr<Drawable> > * dMP, JShader * shader)

@@ -1,6 +1,6 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "Player.h"
-#include "glm/gtx/transform.hpp"
+#include <glm/gtx/transform.hpp>
 
 const vec3 speed(40.f, 40.f, 20.f);
 

@@ -1,7 +1,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include "BaseEngine.h"
-#include <SDL2/SDL_image.h>
+#include <SDL_image.h>
 
 bool init(BaseEngine& engine);
 void close();

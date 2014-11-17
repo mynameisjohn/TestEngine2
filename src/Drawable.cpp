@@ -1,8 +1,8 @@
 #include <GL/glew.h>
 #include "Drawable.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "glm/gtx/transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
 
 Drawable::Drawable(JShader * shader, int mode, vec4 origin)
 :mShader(shader), mMode(mode){

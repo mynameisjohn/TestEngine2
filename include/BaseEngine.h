@@ -5,7 +5,7 @@
 #include "Level.h"
 
 #include <memory>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <iostream>
 
 

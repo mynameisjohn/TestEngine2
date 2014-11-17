@@ -1,5 +1,5 @@
 #include "Seeker.h"
-#include "glm/gtc/random.hpp"
+#include <glm/gtc/random.hpp>
 
 Seeker::Seeker()
 : ActiveEnt()

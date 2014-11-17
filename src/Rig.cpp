@@ -1,6 +1,6 @@
 #include "Rig.h"
-#include "glm/gtx/transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 Rig::Rig(JShader * shader, unordered_map<string, Cycle> cmap, vector<vec4> j)
 : Drawable(shader, 1), numPoses(0), cMap(move(cmap)){//, origins(move(j))

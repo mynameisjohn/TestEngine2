@@ -1,5 +1,5 @@
 #include "QuatVec.h"
-#include "glm/gtx/transform.hpp"
+#include <glm/gtx/transform.hpp>
 #include "Util.h"
 
 QuatVec::QuatVec()
