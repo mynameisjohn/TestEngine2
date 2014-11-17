@@ -13,6 +13,6 @@ Drawable initPolyFromSVG(string fileName, JShader& shader);
 Drawable initSpriteSheet(string fileName, JShader& shader);
 Drawable initObj(string fileName, JShader& shader);
 Rig initRigFromSVG(string fileName, JShader& shader);
-GLuint genVAO(geoInfo gI, JShader& shader);
+uint32_t genVAO(geoInfo gI, JShader& shader);
 
 #endif

@@ -1,5 +1,14 @@
 #include <JShader.h>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#include <glew.c>
+#else
+#include <GL/glew.h>
+#endif
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+
 JShader::JShader(){
 	u_MVHandle = -1;
 	u_ProjHandle = -1;
@@ -14,7 +23,7 @@ JShader::JShader(){
 }
 
 bool JShader::loadProgram(){
-	GLint success = GL_TRUE;	
+	int success = GL_TRUE;	
 	
 	if (!mVS){
 		printf("Missing vertex shader\n");
@@ -119,35 +128,35 @@ bool JShader::loadFrag(std::string fragStr){
 	return true;
 }
 
-GLint JShader::getRigMatHandle(){
+int JShader::getRigMatHandle(){
 	return u_RigMatHandle;
 }
 
-GLint JShader::getWeightHandle(){
+int JShader::getWeightHandle(){
 	return a_WeightHandle;
 }
 
-GLint JShader::getPosHandle(){
+int JShader::getPosHandle(){
 	return a_PosHandle;
 }
 
-GLint JShader::getTexCoordHandle(){
+int JShader::getTexCoordHandle(){
 	return a_TexCoordHandle;
 }
 
-GLint JShader::getMVHandle(){
+int JShader::getMVHandle(){
 	return u_MVHandle;
 }
 
-GLint JShader::getProjHandle(){
+int JShader::getProjHandle(){
 	return u_ProjHandle;
 }
 
-GLint JShader::getColorHandle(){
+int JShader::getColorHandle(){
 	return u_ColorHandle;
 }
 
-GLint JShader::getModeHandle(){
+int JShader::getModeHandle(){
 	return u_ModeHandle;
 }
 

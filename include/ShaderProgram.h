@@ -5,14 +5,6 @@
 #ifndef SHADER_PROGRAM_H
 #define SHADER_PROGRAM_H
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#include <glew.c>
-#else
-#include <GL/glew.h>
-#endif
-
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <string>
 #include <fstream>
 
@@ -25,15 +17,15 @@ class ShaderProgram
 		virtual void freeProgram();       //Free Program
 		bool bind();                      //Bind Shader for use
 		void unbind();                    //Unbind Shader
-		GLuint getProgramID();            //Get Program ID
+		uint32_t getProgramID();            //Get Program ID
 
 	protected:
-		void printProgramLog(GLuint program); //Print Program Log
-		void printShaderLog(GLuint shader);   //Print Shader Log
-		GLint getAttribHandle(std::string name);
-		GLint getUniformHandle(std::string name);
-		GLuint loadShaderFromFile(std::string path, GLenum shaderType); //Load Shader from Text File
-		GLuint mProgramID; //Program ID
+		void printProgramLog(uint32_t program); //Print Program Log
+		void printShaderLog(uint32_t shader);   //Print Shader Log
+		int getAttribHandle(std::string name);
+		int getUniformHandle(std::string name);
+		uint32_t loadShaderFromFile(std::string path, uint32_t shaderType); //Load Shader from Text File
+		uint32_t mProgramID; //Program ID
 };
 
 #endif

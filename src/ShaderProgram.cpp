@@ -2,8 +2,17 @@
 
 #include <ShaderProgram.h>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#include <glew.c>
+#else
+#include <GL/glew.h>
+#endif
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+
 ShaderProgram::ShaderProgram(){
-	mProgramID = (GLuint)NULL;
+	mProgramID = (uint32_t)NULL;
 }
 
 ShaderProgram::~ShaderProgram(){
@@ -16,7 +25,7 @@ void ShaderProgram::freeProgram(){
 
 bool ShaderProgram::bind(){
 	glUseProgram(mProgramID);
-	GLenum err = glGetError();
+	uint32_t err = glGetError();
 	if (err != GL_NO_ERROR){
 		printf( "Error binding shader! %s\n", gluErrorString(err));
 		printProgramLog(mProgramID);
@@ -27,14 +36,14 @@ bool ShaderProgram::bind(){
 }
 
 void ShaderProgram::unbind(){
-	glUseProgram((GLuint)NULL);
+	glUseProgram((uint32_t)NULL);
 }
 
-GLuint ShaderProgram::getProgramID(){
+uint32_t ShaderProgram::getProgramID(){
 	return mProgramID;
 }
 
-void ShaderProgram::printProgramLog(GLuint program){
+void ShaderProgram::printProgramLog(uint32_t program){
 	if (glIsProgram(program)){
 		int infoLogLength=0, maxLength=0;
 		char * infoLog;
@@ -54,7 +63,7 @@ void ShaderProgram::printProgramLog(GLuint program){
 	return;
 }
 
-void ShaderProgram::printShaderLog(GLuint shader){
+void ShaderProgram::printShaderLog(uint32_t shader){
 	if (glIsShader(shader)){
       int infoLogLength=0, maxLength=0;
       char * infoLog;
@@ -74,8 +83,8 @@ void ShaderProgram::printShaderLog(GLuint shader){
    return;
 }
 
-GLuint ShaderProgram::loadShaderFromFile(std::string path, GLenum shaderType){
-	GLuint shaderID=0;
+uint32_t ShaderProgram::loadShaderFromFile(std::string path, uint32_t shaderType){
+	uint32_t shaderID=0;
 	std::string shaderString;
 	std::ifstream sourceFile(path.c_str());
 
@@ -86,7 +95,7 @@ GLuint ShaderProgram::loadShaderFromFile(std::string path, GLenum shaderType){
 		const GLchar * shaderSource = shaderString.c_str();
 		glShaderSource(shaderID, 1, (const GLchar**)&shaderSource, NULL);
 		glCompileShader(shaderID);
-		GLint shaderCompiled = GL_FALSE;
+		int shaderCompiled = GL_FALSE;
 		glGetShaderiv(shaderID, GL_COMPILE_STATUS, &shaderCompiled);
 		if (shaderCompiled != GL_TRUE){
 			printf("Unable to compile shader %d!\n\nSource:\n%s\n", shaderID, shaderSource);
@@ -101,8 +110,8 @@ GLuint ShaderProgram::loadShaderFromFile(std::string path, GLenum shaderType){
 	return shaderID;
 }
 
-GLint ShaderProgram::getAttribHandle(std::string name){
-	GLint handle = glGetAttribLocation(mProgramID, name.c_str());
+int ShaderProgram::getAttribHandle(std::string name){
+	int handle = glGetAttribLocation(mProgramID, name.c_str());
 	if (handle==-1){
 		printf("%s is not a valid shader program variable.\n",name.c_str());
 		return -1;
@@ -110,8 +119,8 @@ GLint ShaderProgram::getAttribHandle(std::string name){
 	return handle;
 }
 
-GLint ShaderProgram::getUniformHandle(std::string name){
-	GLint handle = glGetUniformLocation(mProgramID, name.c_str());
+int ShaderProgram::getUniformHandle(std::string name){
+	int handle = glGetUniformLocation(mProgramID, name.c_str());
 	if (handle==-1){
 		printf("%s is not a valid shader program variable.\n",name.c_str());
 		return -1;

@@ -5,18 +5,27 @@
 #define TIXML_USE_STL
 #endif
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#include <glew.c>
+#else
+#include <GL/glew.h>
+#endif
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+
 #include <tinyxml.h>
 #include <sstream>
 #include <glm/gtx/transform.hpp>
 #include <unordered_set>
 
 //Create a Vertex Array Object given some geometry info
-GLuint genVAO(geoInfo gI, JShader& shader){
-	GLuint VAO;
+uint32_t genVAO(geoInfo gI, JShader& shader){
+	uint32_t VAO;
    glGenVertexArrays(1, &VAO);
    glBindVertexArray(VAO);
 
-   GLuint buffers[4];
+   uint32_t buffers[4];
    glGenBuffers(4, buffers);
 
    //vertices
@@ -138,7 +147,7 @@ Rig initRigFromSVG(string fileName, JShader& shader){
 	Rig r(getRigFromSVG(rigName, shader));
 	geoInfo gI = SVGtoGeometry(SVG_DIR+resName+".svg", true);
 	r.setOrigins(gI.origins);
-   GLuint VAO = genVAO(gI, shader);
+   uint32_t VAO = genVAO(gI, shader);
 	r.setVAO(VAO);
 	vector<string> imageFiles = getSprtFileList(SPR_DIR+resName+".sprt");
 	for (uint32_t i=0;i<imageFiles.size();i++){
@@ -156,7 +165,7 @@ Drawable initPolyFromSVG(string fileName, JShader& shader){
 
 	geoInfo gI = SVGtoGeometry(SVG_DIR+fileName,0);
 	gI.weights = vector<vec3>();
-	GLuint VAO = genVAO(gI, shader);	
+	uint32_t VAO = genVAO(gI, shader);	
 	string imageName = fileName.substr(0,fileName.length()-3)+"png";
 	string imRes(imageName.substr(0,imageName.length()-4));
    dr.setVAO(VAO);
@@ -206,7 +215,7 @@ Drawable initQuad(JShader& shader){
 	};
 	vector<triangle> indices=getConvexIndices(vertices.size());
 	vector<vec3> weights;
-	GLuint VAO = genVAO({vertices, texCoords, indices, weights}, shader);
+	uint32_t VAO = genVAO({vertices, texCoords, indices, weights}, shader);
 	
 	dr.setVAO(VAO);
 	dr.setNElements(3*indices.size());
@@ -293,11 +302,11 @@ Drawable initCube(JShader& shader){
 		20,21,22,20,22,23
 	};
 
-   GLuint tmpVAO;
+   uint32_t tmpVAO;
    glGenVertexArrays(1, &tmpVAO);
    glBindVertexArray(tmpVAO);
 
-   GLuint buffers[3];
+   uint32_t buffers[3];
    glGenBuffers(3, buffers);
 
    //vertices
