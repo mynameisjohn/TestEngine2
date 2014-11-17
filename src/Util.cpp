@@ -1,7 +1,7 @@
 #include "Util.h"
 #include <sstream>
-#include <glm/gtx/transform.hpp>
-#include <glm/glm.hpp>
+#include "glm/gtx/transform.hpp"
+#include "glm/glm.hpp"
 
 void printError(string name){
 	cout << "Unable to load file " << name << ". Segfault imminent" <<  endl;

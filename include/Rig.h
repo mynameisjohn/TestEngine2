@@ -10,11 +10,10 @@ public:
 	void setCycles(vector<Cycle> cycleVec);
 	void addCycle(Cycle c);
 	void addCycle(vector<Cycle> cycleVec);
-	mat4 draw(mat4 parentMV, vec2& u, unsigned int from, unsigned int to, string currentTex="");//, vec4 color=vec4(1));
-	void draw(string currentTex="");//, vec4 color=vec4(1));//ex=0);
+	void draw(string currentTex="");
 	void draw(string currentTex, bool rigged);
 	float getShift();
-	Pose getCurrentPose(string from, string to, vec2& u);//unsigned int from, unsigned int to, vec2& u);
+	Pose getCurrentPose(string from, string to, vec2& u);
 	void uploadRigMats(vector<mat4>& R);
 	string getFirstCycle();
 private:

@@ -1,6 +1,5 @@
 #include "XMLReader.h"
 #include <exception>
-#include <glm/gtx/transform.hpp>
 
 template <typename T>
 bool fillIn(TiXmlElement * el, string id, T& v){
@@ -267,14 +266,6 @@ geoInfo SVGtoGeometry(string svgFile, bool rigged){
 		origins.resize(BonePoints.size());
 		for (uint32_t i=0;i<BonePoints.size();i++)
 			origins[BonePoints.size()-1-i] = vec4(BonePoints[i],0,1);
-/*
-		//I need to get these BonePoints somewhere else
-		//put it in offset
-		for (int i=0;i<vertices.size();i++)
-			//origins.push_back(BonePoints[k]);
-			vertices[i] -= vec4(BonePoints[k],0,0);
-		offset = vec3(BonePoints[k],0);
-*/
 	}
 
 	return {vertices, texCoords, indices, weights, offset, origins};

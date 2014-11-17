@@ -1,8 +1,8 @@
 #include <GL/glew.h>
 #include "Drawable.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/transform.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtx/transform.hpp"
 
 Drawable::Drawable(JShader * shader, int mode, vec4 origin)
 :mShader(shader), mMode(mode){
@@ -29,8 +29,6 @@ void Drawable::addTex(string s, GLuint tex){
 		if (mMode < 0)
 			mMode = 0;
 	}
-	else
-		cout << "Duplicate texture added: " << s << endl;
 }
 
 void Drawable::addTex(vector<pair<string, GLuint> > texVec){
@@ -42,19 +40,19 @@ void Drawable::setNElements(int n){
 	mElementCount = n;
 }
 
+//I suppose this means mode's getting phased out
 void Drawable::draw(string currentTex){//, vec4 color){
-	//Find inherited transform
-	unordered_map<string,GLuint>::iterator it;
+	int mode(-1);
 
-	if (texMap.size()){
-		if (currentTex.length() && ((it=texMap.find(currentTex)) != texMap.end()))
+	if (currentTex.length()){
+		unordered_map<string,GLuint>::iterator it(texMap.find(currentTex));
+		if (it != texMap.end()){
 			glBindTexture(GL_TEXTURE_2D,it->second);
-		else
-			glBindTexture(GL_TEXTURE_2D,texMap.begin()->second);
+			mode = 0;
+		}
 	}
 	
-	glUniform1i(mShader->getModeHandle(), mMode);
-
+	glUniform1i(mShader->getModeHandle(), mode);
 	glBindVertexArray(mVAO); //Bind my VAO
 	glDrawElements(GL_TRIANGLES, mElementCount, GL_UNSIGNED_INT, NULL);
 }

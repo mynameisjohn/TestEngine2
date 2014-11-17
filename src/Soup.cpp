@@ -1,44 +1,47 @@
 #include "Soup.h"
 #include "Textures.h"
 #include "Closet.h"
-#include <glm/gtx/transform.hpp> 
+#include "glm/gtx/transform.hpp" 
 
 #include "Projectile.h"
 
+//The reason these exist outside of the Soup namespace is because I didn't
+//want Level to inherit the tinyxml library
 Entity loadEntity(TiXmlElement * el, unordered_map<string, unique_ptr<Drawable> > * dMapPtr, JShader& shader);
 Collider getCollider(TiXmlElement * collider);
 
+//Retun a unique_ptr to a population given the Level File (XML)
 unique_ptr<Population> Soup::createPopulation(string levelFile, JShader& shader){
 	unique_ptr<Population> pop(nullptr);
 	vector<Obstacle> obsVec;
 	vector<Seeker> seekVec;
+	bool playerExists(false);
+	Player player;
 
+	//Load up XML File, Create Handle/Pointer to Level Element
 	TiXmlDocument doc(levelFile.c_str());
-
    if (!doc.LoadFile()){
       printError(levelFile);
       return pop;
    }
-
 	TiXmlHandle h(&doc);
    TiXmlNode * level;
    level = h.FirstChild("Level").ToNode();
-
-	bool playerExists(false);
-	Player player;
 	TiXmlNode * n(nullptr);
+
 	while ((n = level->IterateChildren(n))){
 		string type(n->Value());
 		char mode(type[type.length()-1]);
 
+		//load entities code (NYI)
 		if (mode == 's'){
-			//load entities code
 			cout << "multiple entities" << endl;
 		}
-		else{
+		else{//Load Individual Entities
 			TiXmlElement * el = n->ToElement();
 			if (!el)
 				break;
+			//Create Base Entity, then create specific type
 			Entity e(loadEntity(el, dMapPtr, shader));
 			if (type=="Obstacle")
 				obsVec.emplace_back(e);
@@ -48,11 +51,12 @@ unique_ptr<Population> Soup::createPopulation(string levelFile, JShader& shader)
 				stringstream(el->Attribute("health")) >> h;
 				seekVec.back().setHealth(h);
 			}
-			if (type == "Player"){
+			if (!playerExists && type == "Player"){
 				player = Player(e);
 				float h;
 				stringstream(el->Attribute("health")) >> h;
 				player.setHealth(h);
+				//Make Projectile for the player (needs to be generalized)
 				if (el->FirstChildElement("Projectile")){
 					TiXmlElement * projEl = el->FirstChildElement("Projectile");
 					player.setProjectile(Projectile(loadEntity(projEl, dMapPtr, shader)));
@@ -61,172 +65,187 @@ unique_ptr<Population> Soup::createPopulation(string levelFile, JShader& shader)
 			}
 		}
 	}
+	//Ensure a player was created
 	if (!playerExists){
 		cout << "No player in population for level " << levelFile << ". Problems inbound." << endl;
 		printError(levelFile);
 	}
 
 	pop = unique_ptr<Population>(new Population(player, obsVec, seekVec));
-	return pop;
+	return move(pop);
 }
 
+//Load a generic Entity, given an XML Element containing its pertinents
 Entity loadEntity(TiXmlElement * el, unordered_map<string, unique_ptr<Drawable> > * dMapPtr, JShader& shader){
 	Skeleton s;
 	Collider col;
+	BoundBox bb;
 
+	//Initialize the closet
 	Closet c(dMapPtr, &shader);
+
+	//Used to debug collider boxes
 	bool collider_dbg(false);
+	
+	//Transforms
 	vec3 translate, scale;
 	vec4 rotate, color(1);
 	fquat rotQuat;
-	float S;
 
+	//Fill the transforms given the element
 	fillVec(rotate, el->Attribute("R"));
 	fillVec(translate, el->Attribute("T"));
 	fillVec(scale, el->Attribute("S"));
 	rotQuat = (getRQ(rotate));
 	fillVec(color, string(el->Attribute("color")));
-	mat4 MV = glm::mat4_cast(rotQuat);
-/*
-	cout << translate << "\n" <<
-	rotate << "\n" <<
-	scale << "\n" <<
-	color << "\n" << endl;
-*/
-	//We've already added these three, hopefully
-	string dType(el->Attribute("dType")), name;
-	if (dType == "cube" || dType == "quad" || dType == "texQuad"){
-		Drawable * drPtr = (*dMapPtr)[dType].get();
-		if (dType == "texQuad"){
-			if (el->Attribute("resource")){
-				name = string(el->Attribute("resource"));
-				if (name == "outline")
-					drPtr->addTex(name, outlineTexture());
-				else
-					drPtr->addTex(name, fromImage("res/img/"+name));
+
+	//Get the element's resource (used to create drawable)
+	string resource(el->Attribute("resource"));
+
+	/*Handle various resource cases:
+		quad   - solid color quad
+		cube   - solid color cube
+		o_cube - outline texture cube
+		PNG    - a textured quad
+		XML    - a hierarchical skeleton
+		OBJ    - a 3d .obj file
+	*/
+	if (resource == "cube" || resource == "quad")
+		s = Skeleton((*dMapPtr)[resource].get());
+	else if (resource == "o_cube"){
+		Drawable * drPtr((*dMapPtr)["cube"].get());
+		drPtr->addTex("outline", outlineTexture());
+		s = Skeleton(drPtr);
+		s.getRoot()->setCurTex("outline");
+	}
+	else{ //Characterize case by file extension
+		string extension(resource.substr(resource.length()-3,resource.length()));
+
+		//An XML Resource, aka a Skeleton (hierarchical drawables)
+		if (extension == "xml"){
+			//get XML file name, load as TiXmlDocument
+			string fileName(ENT_DIR+resource);
+			TiXmlDocument doc(fileName);
+			if (!doc.LoadFile()){//I should use assertions for this
+				printError(fileName);
+				return Entity();
 			}
-		}
-		s = Skeleton(drPtr);
-		s.setColor(color);
-		if ((el->Attribute("resource") && dType == "texQuad"))
-			s.getRoot()->setCurTex(name);
 
-		BoundBox bb = BoundBox(scale);
-		col = Collider(bb);
-		col.addSub({vec2(col.getDim())});
-
-		S = max(glm::abs(scale));
-		s.scale(S);
-		scale /= S;
-		Ligament * l(s.getRoot());
-		MV = QuatVec(l->getOrigin(),rotQuat,QV_TRT).toMat4()*glm::scale(scale);
-		l->leftMultMV(MV);
-		s.setColor(color);
-
-		col.translate(translate);
-	}
-	else if (dType == "obj"){
-		name = string(el->Attribute("resource"));
-		if (dMapPtr->find(name) == dMapPtr->end())
-			(*dMapPtr)[name] = move(unique_ptr<Drawable>(new Drawable(initObj(name, shader))));
-		Drawable * drPtr((*dMapPtr)[name].get());
-		s = Skeleton(drPtr);
-      s.setColor(color);
-		BoundBox bb = BoundBox(scale);
-      col = Collider(bb);
-      col.addSub({vec2(col.getDim())});
-
-      S = max(glm::abs(scale));
-      s.scale(S);
-      scale /= S;
-      Ligament * l(s.getRoot());
-      MV = QuatVec(l->getOrigin(),rotQuat,QV_TRT).toMat4()*glm::scale(scale);
-      l->leftMultMV(MV);
-      s.setColor(color);
-
-      col.translate(translate);
-	}
-	else{
-		//otherwise let's hope we got a skeleton
-		name = string(el->Attribute("resource"));
-		string fileName(string("res/entities/")+name);
-		TiXmlDocument doc(fileName);
-		if (!doc.LoadFile()){
-			printError(fileName);
-			return Entity();
+			//Load skeleton and collider elements
+			TiXmlHandle h(&doc);
+			TiXmlElement * entity(0), * skeleton(0), * collider(0);
+			entity = h.FirstChild("Entity").ToElement();
+			skeleton = entity->FirstChildElement("Skeleton");
+			collider = entity->FirstChildElement("Collider");
+	
+			//if they both exist, generate the data and set collider T/S
+			if (skeleton && collider){
+				col = Collider(getCollider(collider));
+				s = Skeleton(c.createSkeleton(skeleton, shader));
+				col.translate(translate);
+				col.scale(glm::abs(scale));
+				//These collider transforms shouldn't be repeated, hence goto
+				goto initSkeleton;
+			}
+			else printError(fileName);
 		}
 
-		TiXmlHandle h(&doc);
-		TiXmlElement * entity(0), * skeleton(0), * collider(0);
-		entity = h.FirstChild("Entity").ToElement();
-		skeleton = entity->FirstChildElement("Skeleton");
-		collider = entity->FirstChildElement("Collider");
+		//A PNG resource, which I take to be an image-textured quad
+		else if (extension == "png"){
+			//Get the image name (minus extension) and full file path
+			string resName(resource.substr(0,resource.length()-4));
+			string fileName(IMG_DIR+resource);
+			//Get the quad drawable pointer, add the texture
+			Drawable * drPtr((*dMapPtr)["quad"].get());
+			drPtr->addTex(resName,fromImage(fileName));
+			//Create skeleton and return
+			s = Skeleton(drPtr);
+			s.getRoot()->setCurTex(resName);
+		}
 
-		if (skeleton && collider){
-			col = Collider(getCollider(collider));
-			col.scale(glm::abs(scale));
-			col.translate(translate);
-
-			s = Skeleton(c.createSkeleton(skeleton, shader));
-			S = max(glm::abs(scale));
-			s.scale(S);
-			s.leftMultMV(glm::translate(vec3(0,0,-scale.z/S)));
-			s.setColor(color);
+		//An OBJ resource, taken to be a .obj file created in some 3d application
+		else if (extension == "obj"){
+			//Pretty much the standard thing (more goto ?=? less repetition?)
+			Drawable * drPtr;
+			string fileName(OBJ_DIR+resource);
+			string resName(resource.substr(0,resource.length()-4));
+			if (dMapPtr->find(resName) == dMapPtr->end())
+				(*dMapPtr)[resName] = move(unique_ptr<Drawable>
+													(new Drawable(initObj(fileName, shader))));
+			drPtr = (*dMapPtr)[resName].get();
+			s = Skeleton(drPtr);
 		}
 	}
-	//in the future it'll be best to make a separate entity for collider boxes, tied to this one somehow
+
+	//For non XML resources, create the Collider
+	bb = BoundBox(scale);
+	col = Collider(bb);
+	col.addSub({vec2(col.getDim())});
+	col.translate(translate);
+	//This is necessary to get object scale (skeleton(world) scale is uniform)
+	s.leftMultMV(glm::scale(scale/max(glm::abs(scale))));
+
+	//initialize skeleton
+	initSkeleton:
+	float skelScale = max(glm::abs(scale));
+	s.leftMultMV(QuatVec(s.getOrigin(), rotQuat, QV_TRT).toMat4());
+	scale /= skelScale;
+	s.scale(skelScale);
+	s.setColor(color);
+
 	if (el->Attribute("dbg")){
-		if (!(stringstream(el->Attribute("dbg")) >> collider_dbg))
-			collider_dbg = false;
+		stringstream(el->Attribute("dbg")) >> collider_dbg;
+		cout << el->Attribute("dbg") << endl;
+	}
+	//Create some cubes and quads to illustrate the Collider's boundaries
+	if (collider_dbg){
+		//Get Collider Scale (for box), create Ligament
+		vec3 cScale(col.getDim()/skelScale);
+		cScale.z *= -1;
+		mat4 c_MV(glm::translate(vec3(0,0,0.05f))*glm::scale(cScale));
+		Ligament L((*dMapPtr)["cube"].get());
+		L.leftMultMV(c_MV);
+		L.setColor(vec4(.4,.5,.6,.7));
+		s.addToRoot("collider",L);
 
-		//strange, I know, but the hierarchy proved too annoying to deal with for collider boxes
-		if (collider_dbg){
-			vec3 cScale(col.getDim()/S);
-			cScale.z *= -1;
-			mat4 c_MV(glm::translate(vec3(0,0,0.05f))*glm::scale(cScale));
-
-			vector<BoundRect> subs(col.getSubs());
-			for (uint32_t i=0;i<subs.size();i++){
-				Ligament L_sub((*dMapPtr)["quad"].get());
-				vec2 dim(subs[i].getDim()/S);
-				vec2 pos((subs[i].getPos()-vec2(col.getPos()))/S);
-				mat4 r_MV(glm::translate(vec3(pos,0))*glm::scale(vec3(dim,1)));
-				L_sub.leftMultMV(r_MV);
-				L_sub.setColor(vec4(.6,.5,.4,.7));
-				s.addToRoot("box_"+to_string(i),L_sub);
-			}
-
-			Ligament L((*dMapPtr)["cube"].get());
-			L.leftMultMV(c_MV);
-			L.setColor(vec4(.4,.5,.6,.7));
-			s.addToRoot("collider",L);
+		//Get Sub Rect scales, create Ligaments
+		vector<BoundRect> subs(col.getSubs());
+		for (uint32_t i=0;i<subs.size();i++){
+			Ligament L_sub((*dMapPtr)["quad"].get());
+			vec2 dim(subs[i].getDim()/skelScale);
+			vec2 pos((subs[i].getPos()-vec2(col.getPos()))/skelScale);
+			mat4 r_MV(glm::translate(vec3(pos,0))*glm::scale(vec3(dim,1)));
+			L_sub.leftMultMV(r_MV);
+			L_sub.setColor(vec4(.6,.5,.4,.7));
+			s.addToRoot("box_"+to_string(i),L_sub);
 		}
 	}
 
-	return Entity(col,move(s));
+	//return the entity
+	return Entity(col, s);
 }
 
-
+//Create the Collider, given an XML Element
 Collider getCollider(TiXmlElement * collider){
 	string d=",";
 	BoundBox bb;
 	float soft;
 	vector<BoundRect> recVec;
 
+	//Load in the soft collision value
 	stringstream(collider->Attribute("soft")) >> soft;
 	
+	//Iterate through all sub-rect boxes in element
 	for (TiXmlElement * box=collider->FirstChildElement("box"); box; box=box->NextSiblingElement("box")){
+		//get scale, translation of each box
 		vec3 dim, tr;
-		string in = box->Attribute("S");
-		size_t pos=0;
-		for (int i=0;i<3;i++){
-			pos=in.find(d);
-			stringstream(in.substr(0,pos)) >> dim[i];
-			in.erase(0,pos+d.length());
-		}
+		fillVec(dim,box->Attribute("S"));
 		fillVec(tr,box->Attribute("T"));
 		
+		//create BoundBox
 		bb = BoundBox(tr,dim);
+
+		//Do the same for rects
 		for (TiXmlElement  * rect=box->FirstChildElement("rect"); rect; rect=rect->NextSiblingElement("rect")){
 			vec2 rDim, rTr;
 			fillVec(rDim,rect->Attribute("S"));
@@ -235,6 +254,7 @@ Collider getCollider(TiXmlElement * collider){
 		}
 	}
 
+	//create collider, add rects
 	Collider c(bb, soft);
 	for (vector<BoundRect>::iterator it=recVec.begin(); it!=recVec.end(); it++)
 		c.addSub(*it);

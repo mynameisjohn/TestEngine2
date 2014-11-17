@@ -7,14 +7,10 @@
 
 #include <tinyxml.h>
 #include <sstream>
-#include <glm/gtx/transform.hpp>
+#include "glm/gtx/transform.hpp"
 #include <unordered_set>
 
-const string SVG_DIR  = "res/svg/";
-const string IMG_DIR  = "res/img/";
-const string RIG_DIR  = "res/rig/";
-const string SPRT_DIR = "res/sprt/";
-
+//Create a Vertex Array Object given some geometry info
 GLuint genVAO(geoInfo gI, JShader& shader){
 	GLuint VAO;
    glGenVertexArrays(1, &VAO);
@@ -52,6 +48,7 @@ GLuint genVAO(geoInfo gI, JShader& shader){
 	return VAO;
 }
 
+//Init a drawable from a .obj file
 Drawable initObj(string fileName, JShader& shader){
 	Drawable dr(&shader, -1);
 	map<unsigned int, vec3> vMap;
@@ -134,17 +131,20 @@ Drawable initObj(string fileName, JShader& shader){
 	return initCube(shader);
 }
 
-//Bug with the way offset is being handled
+//Initialize a rig from an SVG file and a rig file
 Rig initRigFromSVG(string fileName, JShader& shader){
-	string rigName = RIG_DIR+fileName+".rig";
+	string resName(fileName.substr(0,fileName.length()-4));
+	string rigName = RIG_DIR+fileName;
 	Rig r(getRigFromSVG(rigName, shader));
-	geoInfo gI = SVGtoGeometry("res/svg/"+fileName+".svg",1);
+	geoInfo gI = SVGtoGeometry(SVG_DIR+resName+".svg", true);
 	r.setOrigins(gI.origins);
    GLuint VAO = genVAO(gI, shader);
 	r.setVAO(VAO);
-	vector<string> imageFiles = getSprtFileList("res/sprt/"+fileName+".sprt");
-	for (uint32_t i=0;i<imageFiles.size();i++)
-      r.addTex(imageFiles[i].substr(0,imageFiles[i].length()-4),fromImage("res/img/"+imageFiles[i]));
+	vector<string> imageFiles = getSprtFileList(SPR_DIR+resName+".sprt");
+	for (uint32_t i=0;i<imageFiles.size();i++){
+		string imRes(imageFiles[i].substr(0,imageFiles[i].length()-4));
+		r.addTex(imRes, fromImage(IMG_DIR+imageFiles[i]));
+	}
    r.setNElements(3*gI.indices.size());
 
 	return r;
@@ -154,43 +154,44 @@ Rig initRigFromSVG(string fileName, JShader& shader){
 Drawable initPolyFromSVG(string fileName, JShader& shader){
 	Drawable dr(&shader, 0);
 
-	geoInfo gI = SVGtoGeometry("res/svg/"+fileName,0);
+	geoInfo gI = SVGtoGeometry(SVG_DIR+fileName,0);
 	gI.weights = vector<vec3>();
 	GLuint VAO = genVAO(gI, shader);	
-	string imageName = fileName.substr(0,fileName.length()-4)+".png";
+	string imageName = fileName.substr(0,fileName.length()-3)+"png";
+	string imRes(imageName.substr(0,imageName.length()-4));
    dr.setVAO(VAO);
-   dr.addTex(imageName.substr(0,imageName.length()-4),fromImage("res/img/"+imageName));//outlineTexture());
+   dr.addTex(imRes, fromImage(IMG_DIR+imageName));
    dr.setNElements(3*gI.indices.size());
 
    return dr;
 }
 
+//Creates a textured quad with multiple textures to choose from
 Drawable initSpriteSheet(string fileName, JShader& shader){
 	Drawable dr = initQuad(shader);
-	vector<string> files = getSprtFileList("res/sprt/"+fileName+".sprt");
-	for (uint32_t i=0;i<files.size();i++)
-		dr.addTex(files[i].substr(0,files[i].length()-4),fromImage("res/img/"+files[i]));//"res/img/"+imageName+".png"));
+	vector<string> files = getSprtFileList(SPR_DIR+fileName);
+	for (uint32_t i=0;i<files.size();i++){
+		string imRes(files[i].substr(0,files[i].length()-4));
+		dr.addTex(imRes, fromImage(IMG_DIR+files[i]));
+	}
 	
 	return dr;
 }
 
-Drawable initTexQuad(JShader& shader, string imageName){
-	
+//Initialize a Textured Quad
+Drawable initTexQuad(string fileName, JShader& shader){
 	Drawable dr = initQuad(shader);
-/*
-	if (imageName.length())
-		dr.addTex(fromImage("res/img/"+imageName+".png"));
-	else
-		dr.addTex(outlineTexture());
-*/
-	if(!imageName.length() || imageName=="outline")
+	if(fileName == "outline")
 		dr.addTex("outline", outlineTexture());
-	else
-		dr.addTex(imageName, fromImage("res/img/"+imageName+".png"));
+	else{
+		string resName(fileName.substr(0,fileName.length()-4));
+		dr.addTex(resName, fromImage(IMG_DIR+fileName));
+	}
 
 	return dr;
 }
 
+//Initialize a quad
 Drawable initQuad(JShader& shader){
 	Drawable dr(&shader,-1, vec4(0.5,0.5,0,1));
 
@@ -210,10 +211,6 @@ Drawable initQuad(JShader& shader){
 	dr.setVAO(VAO);
 	dr.setNElements(3*indices.size());
 
-	//THIS LINE SHIFTS THE QUAD ORIGIN TO (0.5,0.5) (aka the center)
-	//RATHER THAN (0,0) (aka the bottom left corner). 
-	//There were too many times where I needed the rotation to appear in place
-	//dr.leftMultMV(glm::translate(vec3(-.5,-.5,0)));
 	dr.setOrigin(vec4(0.5,0.5,0,1));
 
    return dr;
@@ -221,15 +218,8 @@ Drawable initQuad(JShader& shader){
 
 //I don't even want to touch this
 Drawable initCube(JShader& shader){
-/*
-   const int nVert=24, dim=3, nIndices=36;
-   const int vStride = nVert*dim*sizeof(GLint);
-   const int tStride = nVert*2*sizeof(GLfloat);
-   const int iStride = nIndices*sizeof(GLuint);
-*/
 	Drawable dr(&shader);
 
-//	int verticeCount = 24;
 	int faceCount = 12;
 
 	float vertices[] = {
@@ -330,8 +320,6 @@ Drawable initCube(JShader& shader){
    glBindVertexArray(0);
 
 	dr.setVAO(tmpVAO);
-	//dr.addTex(outlineTexture());
-	dr.addTex("outline",outlineTexture());
 	dr.setNElements(faceCount*3);
 	dr.setOrigin(vec4(0.5,0.5,0.5,1));
 

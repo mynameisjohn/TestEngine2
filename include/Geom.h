@@ -7,7 +7,7 @@
 #include "XMLReader.h"
 
 Drawable initQuad(JShader& shader);
-Drawable initTexQuad(JShader& shader, string imageName="");
+Drawable initTexQuad(string fileName, JShader& shader);
 Drawable initCube(JShader& shader);
 Drawable initPolyFromSVG(string fileName, JShader& shader);
 Drawable initSpriteSheet(string fileName, JShader& shader);

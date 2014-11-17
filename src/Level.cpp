@@ -1,32 +1,18 @@
 #include "Level.h"
 #include "Rig.h"
-#include <glm/gtx/transform.hpp> 
 
-//get rid of this ASAP
-#include <tinyxml.h>
-#include <functional>
-
-
-unique_ptr<Population> Level::initLevelOne(JShader& shader){
-
-	const vec3 wallMin(-1000, -600, -1000);
-   const vec3 wallMax(7000, 2000, -4000);
-
-	if (!s)
-		s = new Soup(&dMap);
-
-	return s->createPopulation("res/level/one.xml", shader);
-}
+const string LEVEL_ONE("res/level/one.xml");
 
 Level::Level()
-: s(nullptr), activePop(0) {
+: activePop(0) {
 }
 
 //this was segfaulting, and now it isn't. be careful
 Level::Level(int l, JShader& shader)
 : Level(){
 //this is bogus for now
-	popVec.push_back(std::move(initLevelOne(shader)));
+	Soup s(&dMap);
+	popVec.push_back(std::move(s.createPopulation(LEVEL_ONE, shader)));
 }
 
 vec4 Level::move(){

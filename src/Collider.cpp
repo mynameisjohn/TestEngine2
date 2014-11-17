@@ -62,7 +62,7 @@ void Collider::scale(vec3 s){
    for (rectIt=mSubs.begin(); rectIt!=mSubs.end(); rectIt++){
 		rectIt->scale(vec2(s));
 		vec2 diff(rectIt->getPos()-vec2(mBB.getPos()));
-		rectIt->moveTo(vec2(s)*diff);
+		rectIt->moveTo(vec2(s)*diff+vec2(getPos()));
 	}
 	soft *= max(s);
 /*

@@ -1,8 +1,8 @@
 #include "Camera.h"
 #include <GL/glew.h>
 #include <GL/gl.h>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/gtx/transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 Camera::Camera(){
 	buf=200.f; 

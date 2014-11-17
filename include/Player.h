@@ -5,7 +5,6 @@
 
 #include "ActiveEnt.h"
 #include "EventRegister.h"
-#include "Rig.h"
 
 #include <list>
 
@@ -14,7 +13,6 @@ class Player: public ActiveEnt{
 		Player();
 		Player(const Entity&);
 		Player(vec3 translate, vec3 scale);
-		~Player();
 		int setChildren();
 		void move();
 		char moveWRT_ent(Entity * e);
@@ -25,7 +23,6 @@ class Player: public ActiveEnt{
 		void updateSkeleton();
 		void takeHit(HitEffect hEff);
 		void setProjectile(Projectile p);
-		void addProjectile(Projectile p);
 		bool overlapsWith(Entity * e);
 		EventRegister * getRegPtr();
 	private:

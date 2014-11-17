@@ -1,5 +1,5 @@
 #include "Entity.h"
-#include <glm/gtx/transform.hpp>
+#include "glm/gtx/transform.hpp"
 
 Entity::Entity()
 : sigmaSq(1.f){}

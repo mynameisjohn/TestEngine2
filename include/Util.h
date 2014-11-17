@@ -5,9 +5,10 @@
 #define GLM_FORCE_RADIANS
 #endif
 
-#include <glm/fwd.hpp>
-#include <glm/gtc/quaternion.hpp>
+#include "glm/fwd.hpp"
+#include "glm/gtc/quaternion.hpp"
 #include <iostream>
+
 
 using glm::fquat;
 using glm::vec2;
@@ -16,6 +17,13 @@ using glm::vec4;
 using glm::mat4;
 
 using namespace std;
+
+const string IMG_DIR("res/img/");
+const string OBJ_DIR("res/obj/");
+const string RIG_DIR("res/rig/");
+const string SVG_DIR("res/svg/");
+const string SPR_DIR("res/sprt/");
+const string ENT_DIR("res/entities/");
 
 int wrap(int dim, int num);
 float min(float v1, float v2);

@@ -16,10 +16,8 @@ public:
 private:
 	vector<unique_ptr<Population> > popVec;
 	unordered_map<string, unique_ptr<Drawable> > dMap;	
-	Soup * s;
 	int activePop;
 
-	unique_ptr<Population> initLevelOne(JShader& shader);
 //	void initWalls(vec3 min, vec3 max, Population * pop, JShader& shader);
 };
 

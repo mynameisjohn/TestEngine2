@@ -1,7 +1,7 @@
 #include "Ligament.h"
 #include "Util.h"
 #include <typeinfo>
-#include <glm/gtx/transform.hpp>
+#include "glm/gtx/transform.hpp"
 #include "Rig.h"
 
 Ligament::Ligament(){

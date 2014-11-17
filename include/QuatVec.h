@@ -5,8 +5,8 @@
 #define GLM_FORCE_RADIANS
 #endif
 
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/quaternion.hpp"
 
 const char QV_TR(1), QV_RT(2), QV_TRT(4);
 

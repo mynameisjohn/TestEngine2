@@ -6,13 +6,9 @@
 #endif
 
 #include <vector>
-#include <glm/glm.hpp>
-//#include <glm/gtx/dual_quaternion.hpp>
+#include "glm/glm.hpp"
 
 #include "QuatVec.h"
-
-//using glm::fdualquat;
-//using glm::fquat;
 
 class Pose{
 public:

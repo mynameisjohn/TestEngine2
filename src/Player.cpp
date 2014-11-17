@@ -1,11 +1,6 @@
 #include <SDL2/SDL.h>
 #include "Player.h"
-#include <glm/gtx/transform.hpp>
-//#include <algorithm>
-const unsigned int STAND  = 0;
-const unsigned int WALK   = 1;
-const unsigned int RUN    = 2;
-const unsigned int JUMP   = 3;
+#include "glm/gtx/transform.hpp"
 
 const vec3 speed(40.f, 40.f, 20.f);
 
@@ -48,14 +43,9 @@ Player::Player(vec3 translate, vec3 scale)
 	sigmaSq *= sigmaSq;
 }
 
-Player::~Player(){
-	//NYI
-}
-
+//Overrides the moveWRT_ent method to account for the player's projectiles
 char Player::moveWRT_ent(Entity * e){
-	char ret=ActiveEnt::moveWRT_ent(e);
 	list<Projectile>::iterator pIt;
-	
 	for (pIt=projList.begin(); pIt!=projList.end(); pIt++){
 		if (pIt->isActive())
 			if (pIt->moveWRT_ent(e)){
@@ -63,19 +53,24 @@ char Player::moveWRT_ent(Entity * e){
 			pIt = projList.erase(pIt);
 		}
 	}
-	return ret;
+	return ActiveEnt::moveWRT_ent(e);
 }
 
+//Overridden move to handle projectile movement
 void Player::move(){
-	ActiveEnt::move();
-
 	list<Projectile>::iterator pIt;
 	for (pIt=projList.begin();pIt!=projList.end();pIt++){
-		if (pIt->isPoised())
-			pIt->moveTo(getOrigin("arm1")-pIt->mSkel.getOrigin()+vec3(0,0,pIt->getSkeleton()->getScale()/5));
+		if (pIt->isPoised()){//this crap...works for now
+			//arrowOffset moves it behind the hand, the rest is positioning
+			vec3 arrowOffset( vec3(0,0,pIt->getSkeleton()->getScale()/5));
+			pIt->moveTo(getOrigin("arm1")+arrowOffset+ (mSkel.flipped() ?
+            vec3(-100,-50,0)+pIt->mSkel.getOrigin() :
+            -pIt->mSkel.getOrigin()));
+		}
 		else if (pIt->isActive())
 			pIt->move();
 	}
+	ActiveEnt::move();
 }
 
 void Player::update(){//EventInfo evInfo){
@@ -94,11 +89,6 @@ void Player::update(){//EventInfo evInfo){
 	updateKeys();
 	updateMouse();
 
-/*
-	static float th(0.f);
-	mSkel["bow"]->applyTransform(getRQ(vec4(th,vec3(0,0,1))));
-	th += 1.f;
-*/
 	list<Projectile>::iterator pIt;
 	for (pIt=projList.begin();pIt!=projList.end();pIt++){
 		if (pIt->isActive())
@@ -130,9 +120,6 @@ void Player::updateMouse(){
 	static bool charging(false), notched(false);
 	const float dCharge(0.05f), chargeMax(1), notch(0.5);
 
-	//A NOTE ON REFLECTION:
-	//a fair armount of stuff has to be accounted for when the model is reflected about the y axis
-	//WRT mouse rotation x direction. I am leaving that off for now, though it is very annoying. 
 	if (eReg.lmb){
 		if (charging){
 			const float armDraw_m(420), armDraw_M(200);
@@ -140,11 +127,10 @@ void Player::updateMouse(){
 			const vec3 armOffset(-.035,.035,0);
 
 			charge = min(chargeMax, charge+dCharge);
-			vec2 r(glm::normalize(eReg.worldMouse - vec2(getOrigin("arm1"))));//mSkel.getOrigin("arm1"))));
+			vec2 r(glm::normalize(eReg.worldMouse - vec2(getOrigin("arm1"))));
 			vec2 armDif(mSkel["arm1"]->getOrigin()-mSkel["arm2"]->getOrigin());
 
 			fquat mouseRot(r.x>0?getQuatFromVec2(r):getQuatFromVec2(r*vec2(-1,1))), armRot(cos(charge),sin(charge)*vec3(-1,0,0)), arrowRot(getQuatFromVec2(r));
-//			float aDo(1.5*mProj.getSkeleton()->getScale()), arrowDraw_M(-mProj.getSkeleton()->getScale());//*(1-charge));
 
 			mSkel["arm1"]->setState(L_ACTIVE);
 			mSkel["arm1"]->applyTransform({armOffset,r90*mouseRot*armRot});
@@ -158,7 +144,7 @@ void Player::updateMouse(){
 			if (charge > notch){
 				if (!notched){
 					notched=true;
-					projList.emplace_back(mProj);//push_back(std::move(mProj));
+					projList.emplace_back(mProj);
 					projList.back().setState(1);
 				}
 				projList.back().getSkeleton()->getRoot()->applyTransform(arrowRot);
@@ -182,9 +168,9 @@ void Player::updateMouse(){
 }
 
 void Player::updateSkeleton(){
-	//I'm convinced I'll need this one day
 }
 
+//As usual, override to handle projectiles
 void Player::draw(){
 	Entity::draw();
 
@@ -193,11 +179,12 @@ void Player::draw(){
 		pIt->draw();
 }
 
+//The same deal
 bool Player::overlapsWith(Entity * e){
 	list<Projectile>::iterator pIt;
 	for (pIt=projList.begin(); pIt!=projList.end(); pIt++){
 		if (pIt->isActive()){
-			if (pIt->overlapsWith(e)){
+			if (pIt->overlapsWith(e)){//what do do
 				cout << "Projectile Hit" << endl;
 				//pIt->kill();
 				//pIt = projList.erase(pIt);
@@ -239,12 +226,9 @@ void Player::updateKeys(){
 					   eReg.getKeyState(SDLK_d));
 
 //This whole moving to jump thing's all messed up
-
 	if (moving){
 		if (dash){
 			to = "run";//RUN;
-//			mSkel["arm1"]->setCurTex("arm_bent");
-//			mSkel["arm2"]->setCurTex("arm_bent");
 		}
 		else
 			to = "walk";//WALK;
@@ -261,108 +245,12 @@ void Player::updateKeys(){
 	mSkel["forearm1"]->set_to(to);
 	mSkel["forearm2"]->set_to(to);
 	mSkel["body"]->set_to(to);
-
-/*
-	if (grounded){
-		if (jumping){
-			((Rig *)(mSkel["leg1"]))->shift();
-			jumping = false;
-		}
-		else if (jump){
-	      ((Rig *)(mSkel["leg1"]))->set_pose(2);
-	      ((Rig *)(mSkel["leg2"]))->set_pose(2);
-			to = JUMP;
-			jumping = true;
-		}
-	}
-*/
-/*
-	//Automate this for all rigs in skeleton
-	r = (Rig *)mSkel["leg1"];
-	r->set_to(to);
-
-	r = (Rig *)mSkel["leg2"];
-	r->set_to(to);
-
-	r = (Rig *)mSkel["arm1"];
-	r->set_to(to);
-
-	if (dash){
-		r->setCurTex(1);
-		r = (Rig *)mSkel["arm2"];
-		r->setCurTex(1);
-		r = (Rig *)mSkel["forearm1"];
-		r->setVisibility(true);
-		r = (Rig *)mSkel["forearm2"];
-		r->setVisibility(true);
-	}
-	else{
-		r->setCurTex(0);
-		r = (Rig *)mSkel["arm2"];
-		r->setCurTex(0);
-		r = (Rig *)mSkel["forearm1"];
-		r->setVisibility(false);
-		r = (Rig *)mSkel["forearm2"];
-		r->setVisibility(false);
-	}
-
-	r = (Rig *)mSkel["arm2"];
-	r->set_to(to);
-	
-	r = (Rig *)mSkel["body"];
-	r->set_to(to);
-*/
-/*
-	Rig * r = (Rig *)mSkel["leg1"];
-	float c;
-	if (eReg.getKeyState(SDLK_a) || eReg.getKeyState(SDLK_d) || eReg.getKeyState(SDLK_s) || eReg.getKeyState(SDLK_w)){
-		if (eReg.getKeyState(SDLK_LSHIFT))
-			c=1.f;//r->set_u({1,mod});
-		else
-			c=0.f;//r->set_u({0,mod});
-	}
-	else
-		c=-1.f;//r->set_u({-1,mod});
-	r->inc_u(c);
-
-	r = (Rig *)mSkel["leg2"];
-	r->inc_u(c);
-	r = (Rig *)mSkel["arm1"];
-	r->inc_u(c);
-	r = (Rig *)mSkel["arm2"];
-	r->inc_u(c);
-*/
 }
 
+//Set the prototype projectile
 void Player::setProjectile(Projectile p){
 	mProj = Projectile(p);
 }
-
-//Why do they have to be unique_ptrs? I may have goofed
-void Player::addProjectile(Projectile p){
-//	unique_ptr<Projectile> q(new Projectile(p));
-//	mProjectiles.push_back(std::move(q));
-
-	projList.emplace_back(p);
-	//projList.back().mSkel.print();
-/*
-	cout << "Projectile " << mProjectiles.size() << ": ";
-	mProjectiles.back()->mSkel.print();
-	cout << endl;
-*/
-//	Projectile P(p);
-//	mProjectiles.push_back(std::move(P));
-}
-
-/*
-void Player::addProjectile(const Projectile p){
-	unique_ptr<Projectile> q(new Projectile());
-
-	mProjectiles.emplace_back(q.get());
-
-//	mProjectiles.push_back(std::move(p));//std::move(p));
-}
-*/
 
 EventRegister * Player::getRegPtr(){
 	return &eReg;

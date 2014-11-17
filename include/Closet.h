@@ -10,6 +10,7 @@
 #include "Geom.h"
 #include "Skeleton.h"
 #include <unordered_map>
+#include <functional>
 
 class Closet{
 public:
@@ -19,6 +20,8 @@ public:
 	int fill(vector<Ligament>& lVec, unordered_map<string, int>& nameMap, TiXmlElement * el, JShader& shader);
 private:
 	unordered_map<string, unique_ptr<Drawable> > * dMapPtr;
+	unordered_map<string, function<Drawable(string, JShader&)> > drFnMap;
+
 };
 
 #endif

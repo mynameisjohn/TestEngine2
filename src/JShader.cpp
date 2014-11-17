@@ -1,5 +1,4 @@
 #include "JShader.h"
-//#include <glm/gtx/transform.hpp>
 
 JShader::JShader(){
 	u_MVHandle = -1;
