@@ -6,9 +6,9 @@
 #endif
 
 #include <vector>
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
-#include "QuatVec.h"
+#include <QuatVec.h>
 
 class Pose{
 public:

@@ -1,7 +1,8 @@
 #include <SDL_opengl.h>
 #include <SDL_image.h>
-#include "Textures.h"
-#include "Util.h"
+
+#include <Textures.h>
+#include <Util.h>
 
 vector<unsigned int> fromFileList(vector<string> files){
 	vector<unsigned int> ret;

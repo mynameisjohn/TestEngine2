@@ -1,7 +1,7 @@
 #ifndef SEEKER_H
 #define SEEKER_H
 
-#include "ActiveEnt.h"
+#include <ActiveEnt.h>
 
 typedef struct PotentialInfo{
 	float sig;

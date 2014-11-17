@@ -1,6 +1,7 @@
-#include "QuatVec.h"
+#include <QuatVec.h>
+#include <Util.h>
+
 #include <glm/gtx/transform.hpp>
-#include "Util.h"
 
 QuatVec::QuatVec()
 : trans(), rot(), mode(QV_TR){

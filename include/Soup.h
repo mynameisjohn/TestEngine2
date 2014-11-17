@@ -1,11 +1,12 @@
 #ifndef SOUP_H
 #define SOUP_H
 
-#include "Seeker.h"
-#include "Player.h"
-#include "Wall.h"
 #include <unordered_map>
-#include "Population.h"
+
+#include <Seeker.h>
+#include <Player.h>
+#include <Wall.h>
+#include <Population.h>
 
 /*
 //add fields for projectiles?

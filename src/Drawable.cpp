@@ -1,8 +1,15 @@
+#include <Drawable.h>
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#include <glew.c>
+#else
 #include <GL/glew.h>
-#include "Drawable.h"
+#endif
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
+
 
 Drawable::Drawable(JShader * shader, int mode, vec4 origin)
 :mShader(shader), mMode(mode){

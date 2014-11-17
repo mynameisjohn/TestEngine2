@@ -1,7 +1,7 @@
 #ifndef BOUNDBOX_H
 #define BOUNDBOX_H
 
-#include "glmBox.h"
+#include <glmBox.h>
 
 class BoundBox : public glmBox{
 public:

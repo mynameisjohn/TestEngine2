@@ -2,10 +2,11 @@
 #define SKELETON_H
 
 #include <map>
-#include "Drawable.h"
 #include <memory>
-#include "Ligament.h"
 #include <unordered_map>
+
+#include <Drawable.h>
+#include <Ligament.h>
 
 class Skeleton{
 public:

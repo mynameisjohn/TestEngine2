@@ -1,4 +1,4 @@
-#include "BoundRect.h"
+#include <BoundRect.h>
 
 BoundRect::BoundRect()
 : glmRect() {}

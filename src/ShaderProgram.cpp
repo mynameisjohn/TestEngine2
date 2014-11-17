@@ -1,6 +1,6 @@
 //also ripped off of lazy foo
 
-#include "ShaderProgram.h"
+#include <ShaderProgram.h>
 
 ShaderProgram::ShaderProgram(){
 	mProgramID = (GLuint)NULL;

@@ -1,9 +1,9 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
-#include "JShader.h"
-#include "Soup.h"
-#include "Wall.h"
+#include <JShader.h>
+#include <Soup.h>
+#include <Wall.h>
 
 class Level{
 public:

@@ -1,5 +1,5 @@
-#include "Level.h"
-#include "Rig.h"
+#include <Level.h>
+#include <Rig.h>
 
 const string LEVEL_ONE("res/level/one.xml");
 

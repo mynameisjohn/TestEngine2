@@ -1,4 +1,4 @@
-#include "ColBuf.h"
+#include <ColBuf.h>
 
 ColBuf::ColBuf(int dim) : CircBuf<int>(dim){
 	collisions=0;

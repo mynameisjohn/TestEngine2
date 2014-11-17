@@ -1,5 +1,5 @@
-#include "Util.h"
-#include "Pose.h"
+#include <Util.h>
+#include <Pose.h>
 
 Pose::Pose()
 : joints(3), T(1.f), dt(0.01f){}

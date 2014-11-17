@@ -1,5 +1,6 @@
-#include "Util.h"
-#include "Closet.h"
+#include <Util.h>
+#include <Closet.h>
+
 #include <glm/gtx/transform.hpp>
 
 //The constructor, which ensures that the cube and drawables exist by default

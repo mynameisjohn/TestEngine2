@@ -1,8 +1,8 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "Collider.h"
-#include "Skeleton.h"
+#include <Collider.h>
+#include <Skeleton.h>
 
 typedef struct HitEffect{
 	float damage;

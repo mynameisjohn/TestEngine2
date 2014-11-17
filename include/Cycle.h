@@ -1,7 +1,7 @@
 #ifndef CYCLE_H
 #define CYCLE_H
 
-#include "Pose.h"
+#include <Pose.h>
 
 class Cycle{
 public:

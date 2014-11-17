@@ -5,7 +5,12 @@
 #ifndef SHADER_PROGRAM_H
 #define SHADER_PROGRAM_H
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#include <glew.c>
+#else
 #include <GL/glew.h>
+#endif
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <string>

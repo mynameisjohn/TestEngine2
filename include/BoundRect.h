@@ -1,7 +1,7 @@
 #ifndef BOUNDRECT_H
 #define BOUNDRECT_H
 
-#include "glmRect.h"
+#include <glmRect.h>
 
 class BoundRect : public glmRect{
 public:

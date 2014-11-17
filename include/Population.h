@@ -1,9 +1,9 @@
 #ifndef POPULATION_H
 #define POPULATION_H
 
-#include "Player.h"
-#include "Obstacle.h"
-#include "Seeker.h"
+#include <Player.h>
+#include <Obstacle.h>
+#include <Seeker.h>
 
 typedef vector<unique_ptr<Obstacle> > ObsPtrVec;
 typedef vector<unique_ptr<ActiveEnt> > AePtrVec;

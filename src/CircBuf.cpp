@@ -1,5 +1,5 @@
-#include "CircBuf.h"
-#include "Pose.h"
+#include <CircBuf.h>
+#include <Pose.h>
 #include <iostream>
 using namespace std;
 template <class T>

@@ -1,4 +1,5 @@
-#include "BoundBox.h"
+#include <BoundBox.h>
+
 #include <stdio.h>
 
 BoundBox::BoundBox()

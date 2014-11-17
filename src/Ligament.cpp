@@ -1,8 +1,9 @@
-#include "Ligament.h"
-#include "Util.h"
+#include <Ligament.h>
+#include <Util.h>
+#include <Rig.h>
+
 #include <typeinfo>
 #include <glm/gtx/transform.hpp>
-#include "Rig.h"
 
 Ligament::Ligament(){
 	resetTransform();

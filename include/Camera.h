@@ -2,7 +2,7 @@
 #define CAMERA_H
 
 //#include "BoundBox.h"
-#include "Player.h"
+#include <Player.h>
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 675

@@ -1,8 +1,8 @@
 #ifndef EVENT_REGISTER_H
 #define EVENT_REGISTER_H
 
-#include "glm/glm.hpp"
-#include "KeyboardHandler.h"
+#include <glm/glm.hpp>
+#include <KeyboardHandler.h>
 
 using glm::vec2;
 

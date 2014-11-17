@@ -2,9 +2,11 @@
 
 #ifndef ACTIVEENT_H
 #define ACTIVEENT_H
+
 #include <stdlib.h>
-#include "Entity.h"
 #include <stdio.h>
+
+#include <Entity.h>
 
 class ActiveEnt: public Entity{
 	public:

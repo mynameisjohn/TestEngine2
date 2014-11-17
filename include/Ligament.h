@@ -5,8 +5,8 @@
 #include <vector>
 #include <list>
 
-#include "Drawable.h"
-#include "QuatVec.h"
+#include <Drawable.h>
+#include <QuatVec.h>
 
 #include <map>
 

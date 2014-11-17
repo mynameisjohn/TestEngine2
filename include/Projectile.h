@@ -1,7 +1,7 @@
 #ifndef PROJECTILE_H
 #define PROJECTILE_H
 
-#include "ActiveEnt.h"
+#include <ActiveEnt.h>
 
 class Projectile: public ActiveEnt{
 	public:

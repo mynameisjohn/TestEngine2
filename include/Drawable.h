@@ -1,8 +1,8 @@
 #ifndef DRAWABLE_H
 #define DRAWABLE_H
 
-#include "JShader.h"
-#include "Util.h"
+#include <JShader.h>
+#include <Util.h>
 
 #include <vector>
 #include <unordered_map>

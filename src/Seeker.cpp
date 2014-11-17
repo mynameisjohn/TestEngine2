@@ -1,4 +1,5 @@
-#include "Seeker.h"
+#include <Seeker.h>
+
 #include <glm/gtc/random.hpp>
 
 Seeker::Seeker()

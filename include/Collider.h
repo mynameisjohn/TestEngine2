@@ -2,11 +2,11 @@
 #define COLLIDER_H
 
 #include <vector>
-//#include <map>
 #include <unordered_map>
-#include "BoundBox.h"
-#include "BoundRect.h"
-#include "ColBuf.h"
+
+#include <BoundBox.h>
+#include <BoundRect.h>
+#include <ColBuf.h>
 
 class Collider{
 	public:

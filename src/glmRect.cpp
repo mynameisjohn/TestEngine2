@@ -1,4 +1,4 @@
-#include "glmRect.h"
+#include <glmRect.h>
 
 glmRect::glmRect(){
 	mPos=vec2();

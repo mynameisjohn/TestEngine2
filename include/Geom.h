@@ -3,8 +3,8 @@
 
 #include <map>
 
-#include "Rig.h"
-#include "XMLReader.h"
+#include <Rig.h>
+#include <XMLReader.h>
 
 Drawable initQuad(JShader& shader);
 Drawable initTexQuad(string fileName, JShader& shader);

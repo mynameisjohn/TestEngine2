@@ -7,8 +7,9 @@
 
 #include <tinyxml.h>
 #include <map>
-#include "Util.h"
-#include "Rig.h"
+
+#include <Util.h>
+#include <Rig.h>
 
 //phase this out
 typedef struct triangle{

@@ -1,9 +1,9 @@
-#include "Soup.h"
-#include "Textures.h"
-#include "Closet.h"
-#include <glm/gtx/transform.hpp> 
+#include <Soup.h>
+#include <Textures.h>
+#include <Closet.h>
+#include <Projectile.h>
 
-#include "Projectile.h"
+#include <glm/gtx/transform.hpp> 
 
 //The reason these exist outside of the Soup namespace is because I didn't
 //want Level to inherit the tinyxml library

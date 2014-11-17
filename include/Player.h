@@ -1,10 +1,9 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "Projectile.h"
-
-#include "ActiveEnt.h"
-#include "EventRegister.h"
+#include <Projectile.h>
+#include <ActiveEnt.h>
+#include <EventRegister.h>
 
 #include <list>
 

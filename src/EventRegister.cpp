@@ -1,4 +1,4 @@
-#include "EventRegister.h"
+#include <EventRegister.h>
 
 EventRegister::EventRegister()
 : lmb(0), rmb(0), worldMouse(0,0), keyHandler()

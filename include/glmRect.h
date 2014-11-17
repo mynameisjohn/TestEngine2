@@ -1,7 +1,7 @@
 #ifndef GLM_RECT
 #define GLM_RECT
 
-#include "Util.h"
+#include <Util.h>
 
 class glmRect{
 public:

@@ -1,4 +1,4 @@
-#include "Obstacle.h"
+#include <Obstacle.h>
 
 Obstacle::Obstacle(){
 	colorOsc = 0.f;

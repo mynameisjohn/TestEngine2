@@ -1,7 +1,7 @@
 #ifndef GLM_BOX
 #define GLM_BOX
 
-#include "Util.h"
+#include <Util.h>
 
 class glmBox{
 public:

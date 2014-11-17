@@ -1,4 +1,5 @@
-#include "glmBox.h"
+#include <glmBox.h>
+
 glmBox::glmBox(){
 	mPos=vec3();
 	mDim=vec3(1, 1, 1);

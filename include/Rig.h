@@ -1,8 +1,8 @@
 #ifndef RIG_H
 #define RIG_H
 
-#include "Drawable.h"
-#include "Cycle.h"
+#include <Drawable.h>
+#include <Cycle.h>
 
 class Rig : public Drawable{
 public:

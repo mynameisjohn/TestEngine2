@@ -1,7 +1,7 @@
 #ifndef J_SHADER_H
 #define J_SHADER_H
 
-#include "ShaderProgram.h"
+#include <ShaderProgram.h>
 
 class JShader : public ShaderProgram{
 	public:

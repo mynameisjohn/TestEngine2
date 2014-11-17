@@ -1,4 +1,5 @@
-#include "Projectile.h"
+#include <Projectile.h>
+
 #include <glm/gtx/transform.hpp>
 
 //these have to be formally deactivated (by a function)

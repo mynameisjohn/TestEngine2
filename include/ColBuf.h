@@ -1,7 +1,7 @@
 #ifndef COLBUF_H
 #define COLBUF_H
 
-#include "CircBuf.h"
+#include <CircBuf.h>
 
 class ColBuf : public CircBuf<int>{
 public:
