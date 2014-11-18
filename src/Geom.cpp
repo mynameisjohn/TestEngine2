@@ -124,9 +124,15 @@ Drawable initObj(string fileName, JShader& shader){
 			t.C = indices[i];
 			gI.indices.push_back(t);
 		}
+
+		cout << centroid(gI.vertices) << endl;
+		normalizeVec(gI.vertices,true);
+
 		dr.setVAO(genVAO(gI,shader));
 		dr.addTex("outline",outlineTexture());
 		dr.setNElements(indices.size());
+		dr.setOrigin(vec4(vec3(centroid(gI.vertices)),1));
+
 		return dr;
 	}
 

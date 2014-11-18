@@ -29,14 +29,12 @@
 <Level>
 	<Player name="girl" dbg="0"
 		health="150"
-		dType="skeleton"
 		resource="girl.xml"
 		T="800,500,-2700"
 		R="0,0,0,1"
 		S="600,600,-20"
 		color="1,1,1,1">
 		<Projectile dbg="0"
-			dType="texQuad"
 			resource="arrow.png"
 			T="0,0,0"
 			R="0,0,0,1"
@@ -45,7 +43,6 @@
 		/>
 	</Player>
 	<Obstacle
-		dType="cube"
 		resource="o_cube"
 		T="1500,-600,-2500"
 		R="0,0,0,1"
@@ -53,9 +50,15 @@
 		color="1,1,1,1"
 	/>
 	<Obstacle
-		dType="cube"
+		resource="lil_gah.obj"
+		T="2500,-600,-2500"
+		R="0,0,0,1"
+		S="400,400,-400"
+		color="1,1,1,1"
+	/>
+	<Obstacle
 		resource="o_cube"
-		T="-1000,-800,-2500"
+		T="-1000,-800,-1500"
 		R="0,0,0,1"
 		S="8000,200,-4000"
 		color="1,1,1,1"

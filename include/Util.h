@@ -90,6 +90,7 @@ T centroid(vector<T>& v){
 template float centroid<float>(vector<float>&);
 template vec2 centroid<vec2>(vector<vec2>&);
 template vec3 centroid<vec3>(vector<vec3>&);
+template vec4 centroid<vec4>(vector<vec4>&);
 
 fquat getRQ(vec4 rot);
 

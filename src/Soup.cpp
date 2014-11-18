@@ -174,6 +174,7 @@ Entity loadEntity(TiXmlElement * el, unordered_map<string, unique_ptr<Drawable> 
 													(new Drawable(initObj(fileName, shader))));
 			drPtr = (*dMapPtr)[resName].get();
 			s = Skeleton(drPtr);
+			s.getRoot()->setCurTex("outline");
 		}
 	}
 

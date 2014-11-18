@@ -67,7 +67,7 @@ int Closet::fill(vector<Ligament>& lVec, unordered_map<string, int>& nameMap, Ti
 
 //Create a ligament given an XML element
 Ligament Closet::createLigament(TiXmlElement * el, JShader& shader){
-	int shift(0); //if a rigged ligament's cycle needs to be shifted
+	bool shift(false); //if a rigged ligament's cycle needs to be shifted
 	vec3 scale(1), translate;
 	vec4 rotate(0,0,0,1);
 	
@@ -81,7 +81,7 @@ Ligament Closet::createLigament(TiXmlElement * el, JShader& shader){
 	if (el->Attribute("S"))
 		fillVec(scale,el->Attribute("S"));
 	if (el->Attribute("shift"))
-      stringstream(string(el->Attribute("shift"))) >> shift;
+		fillIn(shift, el->Attribute("shift"));
 
 	string resName(fileName.substr(0,fileName.length()-4));
 	string extension(fileName.substr(fileName.length()-3,fileName.length()));
