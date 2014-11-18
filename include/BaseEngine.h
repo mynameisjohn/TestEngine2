@@ -21,8 +21,9 @@ public:
 private:
 	Camera cam;
 	JShader shader;
-	unique_ptr<Population> pop;
-	Level level;
+	//unique_ptr<Population> pop;
+	//Level level;
+	unique_ptr<Level> level;
 //	vector<Drawable> drawables;
 };
 

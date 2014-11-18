@@ -193,10 +193,9 @@ Entity loadEntity(TiXmlElement * el, unordered_map<string, unique_ptr<Drawable> 
 	s.scale(skelScale);
 	s.setColor(color);
 
-	if (el->Attribute("dbg")){
+	if (el->Attribute("dbg"))
 		stringstream(el->Attribute("dbg")) >> collider_dbg;
-		cout << el->Attribute("dbg") << endl;
-	}
+	
 	//Create some cubes and quads to illustrate the Collider's boundaries
 	if (collider_dbg){
 		//Get Collider Scale (for box), create Ligament

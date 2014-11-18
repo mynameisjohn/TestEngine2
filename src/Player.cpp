@@ -45,14 +45,18 @@ Player::Player(vec3 translate, vec3 scale)
 
 //Overrides the moveWRT_ent method to account for the player's projectiles
 char Player::moveWRT_ent(Entity * e){
-	list<Projectile>::iterator pIt;
-	for (pIt=projList.begin(); pIt!=projList.end(); pIt++){
-		if (pIt->isActive())
+	list<Projectile>::iterator pIt(projList.begin());
+	while (pIt != projList.end()){
+		if (pIt->isActive()){
 			if (pIt->moveWRT_ent(e)){
-			pIt->kill();
-			pIt = projList.erase(pIt);
+				pIt->kill();
+				pIt = projList.erase(pIt);
+				continue;
+			}
 		}
+		pIt++;
 	}
+
 	return ActiveEnt::moveWRT_ent(e);
 }
 
@@ -89,12 +93,15 @@ void Player::update(){//EventInfo evInfo){
 	updateKeys();
 	updateMouse();
 
-	list<Projectile>::iterator pIt;
-	for (pIt=projList.begin();pIt!=projList.end();pIt++){
+	list<Projectile>::iterator pIt(projList.begin());
+	while (pIt != projList.end()){
 		if (pIt->isActive())
 			pIt->update();
-		else if (!pIt->isAlive())
+		else if (!pIt->isAlive()){
 			pIt = projList.erase(pIt);
+			continue;
+		}
+		pIt++;
 	}
 }
 

@@ -17,14 +17,7 @@ TODO
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#include <glew.c>
-#else
-#include <GL/glew.h>
-#endif
-
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL_Includes.h>
 
 BaseEngine::BaseEngine(){
 	//NYI
@@ -47,25 +40,25 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 	
 //	pop = std::move(initLevel(shader, 1));
 
-	level = Level(1, shader);
+	level = unique_ptr<Level>(new Level(1, shader));
 
 	return true;
 }
 
 void BaseEngine::update(){
 //	pop->update();
-	level.update();
+	level->update();
 }
 
 //figure out a better way to do this
 void BaseEngine::move(){
 //	level.move();
-	cam.push(level.move());//getPlayer());
+	cam.push(level->move());//getPlayer());
 }
 //Try and get SDL out of the picture
 void BaseEngine::handleEvent(SDL_Event& e){
 	//EventRegister * eReg = pop->getPlayer()->getRegPtr();
-	EventRegister * eReg = level.getPlayer()->getRegPtr();
+	EventRegister * eReg = level->getPlayer()->getRegPtr();
 
 	switch (e.type){
 		case SDL_KEYUP:
@@ -93,7 +86,7 @@ void BaseEngine::handleEvent(SDL_Event& e){
 			vec2 sp = remap(vec2(e.motion.x,e.motion.y)/screenDim, m1, m2, m3, m4);//fix this
 
 			//get player position in screen coordinates
-			vec4 playerPos = projMat * vec4(level.getPlayer()->center(), 1);
+			vec4 playerPos = projMat * vec4(level->getPlayer()->center(), 1);
 			playerPos /= playerPos.w;
 
 			//use player screen z to get mouse world coordinates
@@ -116,7 +109,7 @@ void BaseEngine::render(){
 	cam.updateProj(shader.getProjHandle());
 	//draw everything
 	//pop->draw();
-	level.draw();
+	level->draw();
 
 	shader.unbind();
 }

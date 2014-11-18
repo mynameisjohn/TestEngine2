@@ -27,7 +27,7 @@
 	/>
 -->
 <Level>
-	<Player name="girl" dbg="1"
+	<Player name="girl" dbg="0"
 		health="150"
 		dType="skeleton"
 		resource="girl.xml"

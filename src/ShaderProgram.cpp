@@ -2,14 +2,7 @@
 
 #include <ShaderProgram.h>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#include <glew.c>
-#else
-#include <GL/glew.h>
-#endif
-
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL_Includes.h>
 
 ShaderProgram::ShaderProgram(){
 	mProgramID = (uint32_t)NULL;
