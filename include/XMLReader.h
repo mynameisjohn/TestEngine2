@@ -25,10 +25,7 @@ typedef struct geoInfo{
 	vector<vec4> origins;
 } geoInfo;
 
-template <typename T>
-bool fillIn(TiXmlElement * el, string id, T& v); 
 vector<triangle> getConvexIndices(uint32_t n);
-//vector<Cycle> getRigCycles(string svgFile);
 Rig getRigFromSVG(string svgFile, JShader& shader);
 map<string, string> getSVGPathMap(string svgFile);
 geoInfo SVGtoGeometry(string svgFile, bool rigged);

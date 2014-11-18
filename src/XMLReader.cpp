@@ -1,22 +1,6 @@
 #include <XMLReader.h>
 #include <exception>
-/*
-template <typename T>
-bool fillIn(TiXmlElement * el, string id, T& v){
-	try{
-      return stringstream(el->Attribute(id.c_str())) >> v;
-   }
-   catch (exception& e){
-      cout << "XML attribute " << id << " in element " << 
-		string(el->Attribute("id")) << " did not fit in variable. " << endl;
-		return false;
-   }
-	return true;
-}
 
-bool fillIn(string s, unsigned int v);
-bool fillIn(string s, float v);
-*/
 vector<string> getSprtFileList(string sprtFile){
 	vector<string> ret;
 	TiXmlDocument doc(sprtFile);
@@ -34,16 +18,6 @@ vector<string> getSprtFileList(string sprtFile){
 	}
 
 	return ret;
-}
-
-void fillIt(TiXmlElement * el, string id, unsigned int &v){
-	try{
-      stringstream(el->Attribute(id.c_str())) >> v;
-   }
-   catch (exception& e){/*
-      cout << "XML attribute " << id << "in element " << 
-		string(el->Attribute("id")) << " did not fit in variable. " << endl;*/
-   }
 }
 
 vector<triangle> getConvexIndices(uint32_t n){
@@ -113,7 +87,7 @@ Rig getRigFromSVG(string svgFile, JShader& shader){
 					stringstream(inStr.substr(0,pos)) >> R[i];
 					inStr.erase(0,pos+d.length());
 				}
-				Joints.push_back(QuatVec(T,getRQ(R)));//(Joints.size() ? Joints.back() : QuatVec()) * QuatVec(T,getRQ(R)));
+				Joints.push_back(QuatVec(T,getRQ(R)));
 			}
 			poses.emplace_back(Joints);//, t, dt);
 			Joints.clear();
@@ -121,14 +95,9 @@ Rig getRigFromSVG(string svgFile, JShader& shader){
 		float dt;
 		if (!fillIn(dt,cycle->Attribute("dt")))
 			dt=0.02f;
-//		cycles.emplace_back(poses, C, dt);
-//		cout << cycle->Attribute("id") << endl;
 		cMap.emplace(cycle->Attribute("id"),Cycle(poses,C,dt));
-//		cout << cMap.find(cycle->Attribute("id"))->first << endl;
 		poses.clear();
 	}
-//	Rig r(&shader,cMap); // return this one instead
-//	ret.setCycles(cycles);
 	return Rig(&shader, cMap);
 }
 
