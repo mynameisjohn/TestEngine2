@@ -8,7 +8,8 @@
 #include <glm/fwd.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <iostream>
-
+#include <vector>
+#include <sstream>
 
 using glm::fquat;
 using glm::vec2;
@@ -34,13 +35,31 @@ float radToDeg(float r);
 float lagrangeTime(float t0, float t1, float t);
 float lerp(float x, float y, float a);
 
+float min(vec2 v);
+float max(vec2 v);
 float min(vec3 v);
 float max(vec3 v);
+float min(vec4 v);
+float max(vec4 v);
 
 void printError(string name);
+
+template <typename T>
+bool fillIn(T& v, string s){
+	return (bool)(stringstream(s) >> v);
+}
+
+template bool fillIn<uint32_t>(uint32_t&, string);
+template bool fillIn<float>(float&, string);
+template bool fillIn<bool>(bool&, string);
+
 void fillVec(vec2& v, string s);
 void fillVec(vec3& v, string s);
 void fillVec(vec4& v, string s);
+
+vec2 normalizeVec(vector<vec2>& v, bool shape=false);
+vec3 normalizeVec(vector<vec3>& v, bool shape=false);
+vec4 normalizeVec(vector<vec4>& v, bool shape=false);
 
 mat4 getAlignMat(vec3 x, vec3 y, vec3 z);
 mat4 getAlignMat(vec3 u, char o);
@@ -56,6 +75,21 @@ template float remap<float>(float, float, float, float, float);
 template vec2 remap<vec2>(vec2,vec2,vec2,vec2,vec2);
 template vec3 remap<vec3>(vec3,vec3,vec3,vec3,vec3);
 template vec4 remap<vec4>(vec4,vec4,vec4,vec4,vec4);
+
+template <typename T>
+T centroid(vector<T>& v){
+	T a(0);
+	typename vector<T>::iterator it;
+	for (it=v.begin(); it!=v.end(); it++){
+		a = a + *it;
+	}
+	a = a/(float)(v.size());
+
+	return a;
+}
+template float centroid<float>(vector<float>&);
+template vec2 centroid<vec2>(vector<vec2>&);
+template vec3 centroid<vec3>(vector<vec3>&);
 
 fquat getRQ(vec4 rot);
 

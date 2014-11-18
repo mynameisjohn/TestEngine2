@@ -1,5 +1,6 @@
 #include <Util.h>
 #include <sstream>
+#include <limits>
 
 #include <glm/gtx/transform.hpp>
 #include <glm/glm.hpp>
@@ -8,36 +9,46 @@ void printError(string name){
 	cout << "Unable to load file " << name << ". Segfault imminent" <<  endl;
 }
 
+
+
 void fillVec(vec2& v, string s){
-	size_t pos(0);
 	const string d(",");
 	for (int i=0;i<2;i++){
-      pos = s.find(d);
-      if (!(stringstream(s.substr(0,pos)) >> v[i]))
-         cout << "Invalid vector string " << s << endl;
-      s.erase(0,pos+d.length());
-   }
+		fillIn(v[i],s.substr(0,s.find(d)));
+		s.erase(0,s.find(d)+1);
+	}
 }
 
 void fillVec(vec3& v, string s){
-	size_t pos(0);
 	const string d(",");
 	for (int i=0;i<3;i++){
-      pos = s.find(d);
-      if (!(stringstream(s.substr(0,pos)) >> v[i]))
-         cout << "Invalid vector string " << s << endl;
-      s.erase(0,pos+d.length());
-   }
+		fillIn(v[i],s.substr(0,s.find(d)));
+		s.erase(0,s.find(d)+1);
+	}
+}
 
-}void fillVec(vec4& v, string s){
-	size_t pos(0);
+void fillVec(vec4& v, string s){
 	const string d(",");
 	for (int i=0;i<4;i++){
-      pos = s.find(d);
-      if (!(stringstream(s.substr(0,pos)) >> v[i]))
-         cout << "Invalid vector string " << s << endl;
-      s.erase(0,pos+d.length());
-   }
+		fillIn(v[i],s.substr(0,s.find(d)));
+		s.erase(0,s.find(d)+1);
+	}
+}
+
+float min(vec2 v){
+	float m(v[0]);
+	for (int i=1;i<2;i++)
+		if (m > v[i])
+			m = v[i];
+	return m;
+}
+
+float max(vec2 v){
+	float M(v[0]);
+	for (int i=1;i<2;i++)
+		if (M < v[i])
+			M = v[i];
+	return M;
 }
 
 float min(vec3 v){
@@ -54,6 +65,18 @@ float max(vec3 v){
 		if (M < v[i])
 			M = v[i];
 	return M;
+}
+
+float min(vec4 v){
+	float m(v[0]);
+	for (int i=1;i<3;i++)
+		if (m > v[i])
+			m = v[i];
+	return m;
+}
+
+float max(vec4 v){
+	return max(vec3(v));
 }
 
 int wrap(int dim, int num){
@@ -139,6 +162,62 @@ fquat getRQ(vec4 rot){
 vec3 getLagrangeInterpolants(float x){
    x = clamp(x,-1.f,1.f);
    return vec3(-0.5f*x*(1.f-x), 1.f-x*x, 0.5f*x*(1.f+x));
+}
+
+
+vec2 normalizeVec(vector<vec2>& v, bool shape){
+        vector<vec2>::iterator it;
+        vec2 m(numeric_limits<float>::max()), M(numeric_limits<float>::min());
+
+        for (it=v.begin(); it!=v.end(); it++){
+                m = glm::min(m, *it);
+                M = glm::max(M, *it);
+        }
+	M -= m;
+        for (it=v.begin(); it!=v.end(); it++){
+                (*it) -= m;
+		if (shape) (*it) /= max(M);
+		else (*it) /= M;
+        }
+
+        return M;
+}
+
+vec3 normalizeVec(vector<vec3>& v, bool shape){
+        vector<vec3>::iterator it;
+        vec3 m(numeric_limits<float>::max()), M(numeric_limits<float>::min());
+
+        for (it=v.begin(); it!=v.end(); it++){
+                m = glm::min(m, *it);
+                M = glm::max(M, *it);
+        }
+	M -= m;
+        for (it=v.begin(); it!=v.end(); it++){
+                (*it) -= m;
+		if (shape) (*it) /= max(M);
+		else (*it) /= M;
+        }
+
+        return M;
+}
+
+vec4 normalizeVec(vector<vec4>& v, bool shape){
+        vector<vec4>::iterator it;
+        vec4 m(numeric_limits<float>::max()), M(numeric_limits<float>::min());
+
+        for (it=v.begin(); it!=v.end(); it++){
+                m = glm::min(m, *it);
+                M = glm::max(M, *it);
+        }
+	M -= m;
+        for (it=v.begin(); it!=v.end(); it++){
+                (*it) -= m;
+		if (shape) (*it) /= max(M);
+		else (*it) /= M;
+		it->w=1;
+        }
+
+        return M;
 }
 
 ostream& operator<<(ostream& os, const vec2& vec){

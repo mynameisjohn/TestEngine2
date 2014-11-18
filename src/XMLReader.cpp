@@ -1,6 +1,6 @@
 #include <XMLReader.h>
 #include <exception>
-
+/*
 template <typename T>
 bool fillIn(TiXmlElement * el, string id, T& v){
 	try{
@@ -16,7 +16,7 @@ bool fillIn(TiXmlElement * el, string id, T& v){
 
 bool fillIn(string s, unsigned int v);
 bool fillIn(string s, float v);
-
+*/
 vector<string> getSprtFileList(string sprtFile){
 	vector<string> ret;
 	TiXmlDocument doc(sprtFile);
@@ -62,7 +62,7 @@ Rig getRigFromSVG(string svgFile, JShader& shader){
 	vector<QuatVec> Joints;
 	vec3 T, S;
 	vec4 R;
-	unsigned int C;
+	uint32_t C;
 
 	unordered_map<string,Cycle> cMap;
 	vector<vec4> jointPositions;
@@ -92,7 +92,7 @@ Rig getRigFromSVG(string svgFile, JShader& shader){
 	else
 		S = vec3(1);
 
-	if (!fillIn(rig, "C", C))
+	if (!fillIn(C, rig->Attribute("C")))
 		C=1;
 
 	for (cycle = rig->FirstChildElement("cycle"); cycle; cycle=cycle->NextSiblingElement("cycle")){
@@ -119,7 +119,7 @@ Rig getRigFromSVG(string svgFile, JShader& shader){
 			Joints.clear();
 		}
 		float dt;
-		if (!fillIn(cycle,"dt",dt))
+		if (!fillIn(dt,cycle->Attribute("dt")))
 			dt=0.02f;
 //		cycles.emplace_back(poses, C, dt);
 //		cout << cycle->Attribute("id") << endl;

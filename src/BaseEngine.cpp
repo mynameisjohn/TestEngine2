@@ -21,6 +21,12 @@ TODO
 
 BaseEngine::BaseEngine(){
 	//NYI
+	vector<vec3> v({
+		{0,0,0}, {0,0,2}, {0,2,0}, {0,2,2},
+		{2,0,0}, {2,0,2}, {2,2,0}, {2,2,2}
+	});
+
+	normalizeVec(v);
 }
 
 BaseEngine::~BaseEngine(){

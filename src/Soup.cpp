@@ -48,13 +48,13 @@ unique_ptr<Population> Soup::createPopulation(string levelFile, JShader& shader)
 			if (type=="Seeker"){
 				seekVec.emplace_back(e);
 				float h;
-				stringstream(el->Attribute("health")) >> h;
+				fillIn(h, el->Attribute("health"));
 				seekVec.back().setHealth(h);
 			}
 			if (!playerExists && type == "Player"){
 				player = Player(e);
 				float h;
-				stringstream(el->Attribute("health")) >> h;
+				fillIn(h, el->Attribute("health"));
 				player.setHealth(h);
 				//Make Projectile for the player (needs to be generalized)
 				if (el->FirstChildElement("Projectile")){
@@ -194,7 +194,8 @@ Entity loadEntity(TiXmlElement * el, unordered_map<string, unique_ptr<Drawable> 
 	s.setColor(color);
 
 	if (el->Attribute("dbg"))
-		stringstream(el->Attribute("dbg")) >> collider_dbg;
+		fillIn(collider_dbg, el->Attribute("dbg"));
+// >> collider_dbg;
 	
 	//Create some cubes and quads to illustrate the Collider's boundaries
 	if (collider_dbg){
@@ -232,7 +233,7 @@ Collider getCollider(TiXmlElement * collider){
 	vector<BoundRect> recVec;
 
 	//Load in the soft collision value
-	stringstream(collider->Attribute("soft")) >> soft;
+	fillIn(soft, collider->Attribute("soft"));
 	
 	//Iterate through all sub-rect boxes in element
 	for (TiXmlElement * box=collider->FirstChildElement("box"); box; box=box->NextSiblingElement("box")){
