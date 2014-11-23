@@ -15,4 +15,5 @@ git add  tinyxml/CMakeLists.txt \
 			README.md \
 			src/*.cpp \
 			include/*.h \
-			CMakeModules/*.cmake
+			CMakeModules/*.cmake \
+			creatives

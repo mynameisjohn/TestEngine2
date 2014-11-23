@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg4545"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   width="1024"
+   height="1024"
+   sodipodi:docname="lid_uvs.png">
+  <metadata
+     id="metadata4551">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs4549" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1918"
+     inkscape:window-height="1078"
+     id="namedview4547"
+     showgrid="false"
+     borderlayer="true"
+     inkscape:zoom="0.65186406"
+     inkscape:cx="512"
+     inkscape:cy="512"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg4545" />
+  <image
+     width="1024"
+     height="1024"
+     xlink:href="file:///home/john/TestEngine2/creatives/dumpster/lid/lid_uvs.png"
+     id="image4553"
+     x="0"
+     y="0" />
+  <rect
+     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:60.36110306;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     id="rect4555"
+     width="963.63885"
+     height="963.63892"
+     x="30.180552"
+     y="30.180557" />
+</svg>

@@ -19,6 +19,8 @@ TODO
 
 #include <GL_Includes.h>
 
+#include <set>
+
 BaseEngine::BaseEngine(){
 	//NYI
 }

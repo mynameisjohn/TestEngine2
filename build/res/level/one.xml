@@ -50,10 +50,31 @@
 		color="1,1,1,1"
 	/>
 	<Obstacle
-		resource="lil_gah.obj"
-		T="2500,-600,-2500"
+		resource="trashcan.obj"
+		T="3000,-887,-3500"
+		R="90,1,0,0"
+		S="500,600,-500"
+		color="1,1,1,1"
+	/>
+	<Obstacle
+		resource="trashcan.obj"
+		T="2350,-600,-3500"
+		R="0,1,0,0"
+		S="500,600,-500"
+		color="1,1,1,1"
+	/>
+	<Obstacle
+		resource="storefront.obj"
+		T="-1000,-600,-3500"
 		R="0,0,0,1"
-		S="400,400,-400"
+		S="3200,1500,-500"
+		color="1,1,1,1"
+	/>
+	<Obstacle
+		resource="storefront.obj"
+		T="3500,-600,-3500"
+		R="0,0,0,1"
+		S="3200,1500,-500"
 		color="1,1,1,1"
 	/>
 	<Obstacle
@@ -61,6 +82,34 @@
 		T="-1000,-800,-1500"
 		R="0,0,0,1"
 		S="8000,200,-4000"
+		color="1,1,1,1"
+	/>
+	<Obstacle
+		resource="o_cube"
+		T="-1000,-4200,-1500"
+		R="0,0,0,1"
+		S="8000,200,-4000"
+		color="1,1,1,1"
+	/>
+	<Obstacle
+		resource="streetlight.obj"
+		T="3500,-4000,-3500"
+		R="0,0,0,1"
+		S="400,1200,-400"
+		color="1,1,1,1"
+	/>
+	<Obstacle
+		resource="stairs_walls.obj"
+		T="-1000,-4000,-3700"
+		R="0,0,0,1"
+		S="8000,2800,-2000"
+		color="1,1,1,1"
+	/>
+	<Obstacle
+		resource="dumpster.obj"
+		T="-350,-4000,-4500"
+		R="90,0,-1,0"
+		S="500,800,1100"
 		color="1,1,1,1"
 	/>
 </Level>

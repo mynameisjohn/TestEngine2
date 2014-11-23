@@ -10,7 +10,6 @@
 #include <tinyxml.h>
 #include <sstream>
 #include <glm/gtx/transform.hpp>
-#include <unordered_set>
 
 //Create a Vertex Array Object given some geometry info
 uint32_t genVAO(geoInfo gI, JShader& shader){
@@ -53,13 +52,13 @@ uint32_t genVAO(geoInfo gI, JShader& shader){
 //Init a drawable from a .obj file
 Drawable initObj(string fileName, JShader& shader){
 	Drawable dr(&shader, -1);
-	map<unsigned int, vec3> vMap;
-	map<unsigned int, vec2> tMap;
+	unordered_map<uint32_t, vec3> vMap;
+	unordered_map<uint32_t, vec2> tMap;
 	
 	vector<string> faces;
 	geoInfo gI;
 
-	map<string, unsigned int> addedIndices;
+	unordered_map<string, uint32_t> addedIndices;
 
 	ifstream objFile(fileName);
 	
@@ -101,20 +100,21 @@ Drawable initObj(string fileName, JShader& shader){
 			}
 		}
 		vector<string>::iterator sIt;
-		vector<unsigned int> indices;
+		vector<uint32_t> indices;
 
 		for (sIt=faces.begin(); sIt!=faces.end(); sIt++){
-			unsigned int v, t;
+			uint32_t v, t;
 			stringstream(sIt->substr(0,sIt->find("/"))) >> v;
 			stringstream(sIt->substr(sIt->find("/")+1,sIt->length())) >> t;
 			if (addedIndices.find(*sIt) == addedIndices.end()){
 				vec3 vert(vMap[v]);
 				vec2 tex(tMap[t]);
+				tex.y = 1-tex.y;
 				addedIndices[*sIt] = gI.vertices.size();
 				gI.vertices.emplace_back(vert,1);
 				gI.texCoords.push_back(tex);
 			}
-			unsigned int idx(addedIndices[*sIt]);
+			uint32_t idx(addedIndices[*sIt]);
 			indices.push_back(idx);
 		}
 		for (uint32_t i=0;i<indices.size();i++){
@@ -125,11 +125,10 @@ Drawable initObj(string fileName, JShader& shader){
 			gI.indices.push_back(t);
 		}
 
-		cout << centroid(gI.vertices) << endl;
-		normalizeVec(gI.vertices,true);
+		normalizeVec(gI.vertices,false);
 
 		dr.setVAO(genVAO(gI,shader));
-		dr.addTex("outline",outlineTexture());
+		dr.addTex("outline",fromImage(IMG_DIR+"trashcan_tex.png"));//outlineTexture());
 		dr.setNElements(indices.size());
 		dr.setOrigin(vec4(vec3(centroid(gI.vertices)),1));
 
@@ -292,7 +291,7 @@ Drawable initCube(JShader& shader){
 		1.0f, 0.0f,
 		1.0f, 1.0f,
 	};
-	unsigned int faceIndex[] = {
+	uint32_t faceIndex[] = {
 		0,1,2,0,2,3,
 		4,5,6,4,6,7,
 		8,9,10,8,10,11,

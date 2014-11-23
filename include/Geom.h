@@ -1,8 +1,6 @@
 #ifndef GEOM_H
 #define GEOM_H
 
-#include <map>
-
 #include <Rig.h>
 #include <XMLReader.h>
 

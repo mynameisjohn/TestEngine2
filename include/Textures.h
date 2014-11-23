@@ -3,11 +3,8 @@
 #include <string>
 #include <vector>
 
-int * outline(int DIM);
-int * invertedOutline(int DIM);
-unsigned int fromImage(std::string fileName);
-unsigned int outlineTexture();
-unsigned int invertedOutlineTexture();
-std::vector<unsigned int> fromFileList(std::vector<std::string> files);
+uint32_t fromImage(std::string fileName);
+uint32_t outlineTexture(bool invert = false);
+std::vector<uint32_t> fromFileList(std::vector<std::string> files);
 
 #endif
