@@ -13,9 +13,9 @@ public:
 	Skeleton();
 //	Skeleton(map<string, Ligament>, string r, mat4 mv=mat4(), QuatVec qv=QuatVec());
 	Skeleton(Drawable * r);
-	Skeleton(unordered_map<string,int> nM, vector<Ligament> lV);
+	Skeleton(unordered_map<string,uint32_t> nM, vector<Ligament> lV);
 	void print();
-	void addToRoot(string, Ligament l, bool invert=true);
+	void addToRoot(string, Ligament l);
 	void draw(vec3 pos);
 	void draw(mat4 transform);
 	void update();
@@ -34,7 +34,7 @@ public:
 	mat4 getTransformAsMat4();
 	Ligament * getRoot();
 	Ligament * operator[](string idx);
-	vec3 getOrigin(string s="", int idx=0);
+	vec3 getOrigin(string s="", uint32_t idx=0);
 private:
 	//map<string, Ligament> lMap;
 	//Ligament * root;
@@ -43,7 +43,7 @@ private:
 	vec4 mColor;
 	list<QuatVec> mTransform;
 	//string R;
-	unordered_map<string, int> nameMap;
+	unordered_map<string, uint32_t> nameMap;
 	vector<Ligament> lVec;
 	float S;
 	bool flip;

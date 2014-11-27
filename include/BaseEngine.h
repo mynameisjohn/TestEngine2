@@ -24,6 +24,8 @@ private:
 	//unique_ptr<Population> pop;
 	//Level level;
 	unique_ptr<Level> level;
+	bool motionHandled;
+	void handleMotion(float x, float y);
 //	vector<Drawable> drawables;
 };
 

@@ -16,14 +16,13 @@ class Ligament{
 public:
 	Ligament();
 	Ligament(Drawable * dPtr, string cTex="");
-	int addChild(int childOffset, bool invert=true);
+	uint32_t addChild(uint32_t childOffset);
 	void draw(glm::mat4 parent);
 	void setCurTex(string ct);
 	void set_u(vec2 U);
 	void set_cycle(string s);
 	void set_to(string t, int s=L_CYCLIC);//unsigned int t);
 	void setColor(vec4 c);
-
 	void setState(int state);
 	void setActive(bool b=true);
 	void shift();
@@ -46,7 +45,7 @@ private:
 	string cTex, from, to, old;
 	bool active, shifted;
 	int state;
-	vector<int> children;
+	vector<uint32_t> children;
 	mat4 MV;
 	list<QuatVec> mTransform;
 	vec2 u;

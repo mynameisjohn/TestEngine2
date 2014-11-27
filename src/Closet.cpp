@@ -31,7 +31,7 @@ Skeleton Closet::createSkeleton(TiXmlElement * skeleton, JShader& shader){
    if (root){
 		//See Skeleton for more information about the data structure
 		vector<Ligament> lVec;
-		unordered_map<string, int> nameMap;
+		unordered_map<string, uint32_t> nameMap;
 		fill(lVec, nameMap, root, shader);
 		Skeleton s(nameMap, lVec);
 
@@ -44,7 +44,7 @@ Skeleton Closet::createSkeleton(TiXmlElement * skeleton, JShader& shader){
 }
 
 //Recursively add elements to the skeleton in a depth first fashion
-int Closet::fill(vector<Ligament>& lVec, unordered_map<string, int>& nameMap, TiXmlElement * el, JShader& shader){
+uint32_t Closet::fill(vector<Ligament>& lVec, unordered_map<string, uint32_t>& nameMap, TiXmlElement * el, JShader& shader){
    string name = el->Attribute("name");
 	//If the name already exists, a cycle may ensue
 	if (nameMap.find(name) != nameMap.end()){
@@ -53,14 +53,16 @@ int Closet::fill(vector<Ligament>& lVec, unordered_map<string, int>& nameMap, Ti
 	}
 
 	//Find the newest Ligement's index, insert it into nameMap, construct Ligament
-	int curIdx = lVec.size();
+	uint32_t curIdx = lVec.size();
 	nameMap[name]=curIdx;
 	lVec.push_back(createLigament(el, shader));
 
 	//Add all of this Ligament's children
-	for (TiXmlElement * i = el->FirstChildElement("drawable"); i; i=i->NextSiblingElement("drawable"))
-		lVec[curIdx].addChild(fill(lVec, nameMap, i, shader) - curIdx);
-
+	for (TiXmlElement * i = el->FirstChildElement("drawable"); i; i=i->NextSiblingElement("drawable")){
+		//we need a tmp variable because calling fill can resize lVec. fill MUST be called first. 
+		uint32_t tmp(fill(lVec, nameMap, i, shader) - curIdx);
+		lVec[curIdx].addChild(tmp);
+	}
 	//return the ligament's index
 	return curIdx;
 }

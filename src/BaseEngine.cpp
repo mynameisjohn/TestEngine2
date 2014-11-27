@@ -39,8 +39,6 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
    //Generate Shader Program
    if (!shader.loadProgram())
       return false;
-	
-//	pop = std::move(initLevel(shader, 1));
 
 	level = unique_ptr<Level>(new Level(1, shader));
 
@@ -50,6 +48,11 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 void BaseEngine::update(){
 //	pop->update();
 	level->update();
+	if (!motionHandled){
+		int x,y;
+		SDL_GetMouseState(&x,&y);
+		handleMotion((float)x, (float)y);
+	}
 }
 
 //figure out a better way to do this
@@ -80,23 +83,8 @@ void BaseEngine::handleEvent(SDL_Event& e){
 			}
 			break;
 		case SDL_MOUSEMOTION:{
-			const vec2 screenDim(SCREEN_WIDTH, SCREEN_HEIGHT);
-			const vec2 m1(0,1), m2(1,0), m3(-1,-1), m4(1,1);
-			mat4 projMat = cam.getProjMat();
-
-			//map mouse position to screen coordinates
-			vec2 sp = remap(vec2(e.motion.x,e.motion.y)/screenDim, m1, m2, m3, m4);//fix this
-
-			//get player position in screen coordinates
-			vec4 playerPos = projMat * vec4(level->getPlayer()->center(), 1);
-			playerPos /= playerPos.w;
-
-			//use player screen z to get mouse world coordinates
-			vec4 worldMouse = glm::inverse(projMat) * vec4(sp, playerPos.z, 1); 
-			worldMouse /= worldMouse.w;
-	
-			//send it to the event register
-			eReg->handleMotion(vec2(worldMouse));
+			float x(e.motion.x), y(e.motion.y);
+			handleMotion(x,y);
 		}
 		default:
 			break;
@@ -110,12 +98,33 @@ void BaseEngine::render(){
 	//send projection matrix to device
 	cam.updateProj(shader.getProjHandle());
 	//draw everything
-	//pop->draw();
 	level->draw();
 
 	shader.unbind();
+	motionHandled = false;
 }
 
 int keyCode(SDL_Event& e){
    return (int)e.key.keysym.sym;
+}
+
+void BaseEngine::handleMotion(float x, float y){
+	EventRegister * eReg = level->getPlayer()->getRegPtr();
+	const vec2 m1(0,1), m2(1,0), m3(-1,-1), m4(1,1);
+	mat4 projMat = cam.getProjMat();
+
+	//map mouse position to screen coordinates
+	vec2 sp = remap(vec2(x,y)/SCREEN_DIM, m1, m2, m3, m4);//fix this
+
+	//get player position in screen coordinates
+	vec4 playerPos = projMat * vec4(level->getPlayer()->center(), 1);
+	playerPos /= playerPos.w;
+
+	//use player screen z to get mouse world coordinates
+	vec4 worldMouse = glm::inverse(projMat) * vec4(sp, playerPos.z, 1); 
+	worldMouse /= worldMouse.w;
+
+	//send it to the event register
+	eReg->handleMotion(vec2(worldMouse));
+	motionHandled = true;
 }

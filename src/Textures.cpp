@@ -48,7 +48,7 @@ uint32_t fromImage(string fileName){
 	SDL_Surface * s = IMG_Load(fileName.c_str());
 	if (!s){
 		cout << "Failed to load texture " << fileName << endl;
-		return tex;//This is bad
+		return 0;//This is bad
 	}
 	tex = initTexture(s->pixels, s->w, s->h);
 

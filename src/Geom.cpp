@@ -126,14 +126,18 @@ Drawable initObj(string fileName, JShader& shader){
 		}
 
 		normalizeVec(gI.vertices,false);
-
+/*		for (vector<vec4>::iterator it=gI.vertices.begin(); it!=gI.vertices.end(); it++)
+			it->x = 1-it->x;
+*/
 		dr.setVAO(genVAO(gI,shader));
-		dr.addTex("outline",fromImage(IMG_DIR+"trashcan_tex.png"));//outlineTexture());
 		dr.setNElements(indices.size());
 		dr.setOrigin(vec4(vec3(centroid(gI.vertices)),1));
 
 		return dr;
 	}
+	else
+		cout << "Error loading .obj file \n";
+	printError(fileName);
 
 	return initCube(shader);
 }

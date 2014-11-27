@@ -25,59 +25,18 @@ void Camera::translate(vec3 trans){
 
 //what a strange method...
 vec3 Camera::push(vec4 player){
-/*
-	dX = (player.x-mBB.left());
-	//printf("%lf\t",dX);	
-	if (dX < buf){//don't sweat the small stuff...
-		translate(vec3(player.w, 0, 0));
-	}
-	else{
-		dX = (mBB.right() - player.x);
-		//printf("%lf\n",dX);	
-		if (dX < buf){
-			translate(vec3(-player.w, 0, 0));
-		}
-	}
-*/
-/*
-
-	const vec2 buffer = vec2(1)/2.f;
-*/
 	vec4 playerPos = projMat*vec4(player.x,player.y,player.z,1);
 	playerPos /= playerPos.w;
-/*
-	float dy = -.0005f*playerPos.y;
+	vec3 a(100,25, 150);
+	vec3 displace(playerPos);
+	displace.z = 0.95-displace.z;
+	for (int i=0;i<3;i++)
+		if (fabs(displace[i]) < 0.015f)
+				displace[i] = 0;
 
-	vec4 tr(0,dy,0,1);
-	tr = glm::inverse(projMat)*tr;
-	tr /= tr.w;
+	projMat = projMat * glm::translate(-a*displace);
 
-	cout << vec3(player) - mBB.center()+vec3(0,500,0) << endl;
-	projMat = projMat * glm::translate(vec3(0,vec3(vec3(player) - mBB.center()).y*-.05f,0));
-	mBB.translate(-(vec3(0,vec3(vec3(player) - mBB.center()).y*-.05f,0)));
-*/
-
-
-	playerPos.z = 2*(.95-playerPos.z);
-	projMat = projMat * glm::translate(vec3(-150,-25,-100)*glm::pow(vec3(playerPos),vec3(3,3,3)));//0,-50.f*playerPos.y,0));
-//	cout << tr << endl;
-	
-//	projMat = glm::translate(tr)*projMat;
-/*
-	if (ps.x < -buffer.x)
-		tr.x = dt*ps.x+buffer.x;
-	else if (ps.x > buffer.x)
-		tr.x = dt*ps.x-buffer.x;
-
-	cout << playerPos/playerPos.w << endl;
-*/
 	return vec3(playerPos)/playerPos.w;
-/*
-	playerPos /= playerPos.w;
-
-	//returns true of the mouse is to the player's right
-	return (playerPos.x - sp.x < 0);
-*/
 }
 
 //this is all messed up

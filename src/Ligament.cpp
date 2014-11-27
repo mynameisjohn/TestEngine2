@@ -31,8 +31,7 @@ void Ligament::setState(int state){
 void Ligament::setColor(vec4 c){
 	mColor = c;
 }
-int Ligament::addChild(int offset, bool invert){
-	//in future check if already exists
+uint32_t Ligament::addChild(uint32_t offset){
 	children.push_back(offset);
 
 	return children.back();
@@ -116,6 +115,7 @@ void Ligament::update(){
 void Ligament::draw(glm::mat4 parent){
 	//upload color here, for debugging purposes
 	mDrawable->uploadColor(mColor);
+	mat4 toChild;
 
 	if (Rig * r = dynamic_cast<Rig *>(mDrawable)){
 		switch(state){
@@ -141,8 +141,9 @@ void Ligament::draw(glm::mat4 parent){
 								  glm::translate(-vec3(origins[i]));
 				}
 				R.back() = parent*R.back();
-				for (vector<int>::iterator it = children.begin(); it!=children.end(); it++)
-					this[*it].draw(R.back());
+				toChild = R.back();
+//				for (vector<uint32_t>::iterator it = children.begin(); it!=children.end(); it++)
+//					this[*it].draw(R.back());
 				R.back() = R.back()*MV;
 	
 				for (uint32_t i=0; i<R.size()-1; i++)
@@ -165,8 +166,9 @@ void Ligament::draw(glm::mat4 parent){
 					mat4 m = parent*MV;
 					r->uploadMV(m);
 					r->draw(cTex, false);
-					for (vector<int>::iterator it = children.begin(); it!=children.end(); it++)
-						this[*it].draw(parent);
+					toChild = parent;
+//					for (vector<uint32_t>::iterator it = children.begin(); it!=children.end(); it++)
+//						this[*it].draw(parent);
 					break;
 				}
 				Pose p(r->getCurrentPose(from,from,u));
@@ -188,8 +190,9 @@ void Ligament::draw(glm::mat4 parent){
                           glm::translate(-vec3(origins[i]));
 
 				R.back() = parent*R.back();
-				for (vector<int>::iterator it = children.begin(); it!=children.end(); it++)
-					this[*it].draw(R.back());
+				toChild = R.back();
+//				for (vector<uint32_t>::iterator it = children.begin(); it!=children.end(); it++)
+//					this[*it].draw(R.back());
 				R.back() = R.back()*MV;
 	
 				for (uint32_t i=0; i<R.size()-1; i++)
@@ -216,46 +219,14 @@ void Ligament::draw(glm::mat4 parent){
 		mat4 m = parent * MV;
 		mDrawable->uploadMV(m);
 		mDrawable->draw(cTex);
-		for (vector<int>::iterator it = children.begin(); it!=children.end(); it++)
-			this[*it].draw(parent);
+//		for (vector<uint32_t>::iterator it = children.begin(); it!=children.end(); it++)
+//			this[*it].draw(parent);
+		toChild = parent;
 	}
-
-
-/*
-	if (!mTransform.empty())
-		parent=parent*getTransformAsMat4();
-	mat4 m = parent*MV;
-	mDrawable->uploadMV(m);
-*/
-/*
-	parent = mTransform.empty() ? parent * MV : parent * getTransformAsMat4() * MV;
-	mDrawable->uploadMV(parent * );
-*/
-/*
-	if (Rig * r = dynamic_cast<Rig *>(mDrawable)){
-		if (active)
-				r->draw(cTex);
-		else{
-			mat4 back = r->draw(mat4(), u, from, to, cTex);
-			back = glm::translate(vec3(origin))*back*glm::translate(-vec3(origin));
-			parent = parent*back;//parent*r->draw(mat4(), u, from, to, cTex);
-			update();
-		}
+	for (vector<uint32_t>::iterator it = children.begin(); it!=children.end(); it++){
+//		cout << cTex << " is drawing : " << *it << " of " << children.size() << endl;
+		this[*it].draw(toChild);
 	}
-	else
-		mDrawable->draw(cTex);//, color);//curTex);
-//		parent = mDrawable->draw(parent, curTex);
-*/
-/*
-	//lambda
-	for_each(children.begin(), children.end(), [&](int idx){
-		this[idx].draw(parent);
-	});
-*/
-/*
-	for (vector<int>::iterator it = children.begin(); it!=children.end(); it++)
-		this[*it].draw(parent);
-*/
 }
 
 bool Ligament::isActive(){
@@ -323,7 +294,7 @@ void Ligament::leftMultMV(mat4 m){
 }
 
 bool Ligament::hasChild(Ligament * l){
-	for (vector<int>::iterator it = l->children.begin(); it!=l->children.end(); it++){
+	for (vector<uint32_t>::iterator it = l->children.begin(); it!=l->children.end(); it++){
 		
 	}
 /*	if (children.size() == 0)

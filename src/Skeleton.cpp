@@ -6,7 +6,7 @@ Skeleton::Skeleton(){
 	resetTransform();
 }
 
-Skeleton::Skeleton(unordered_map<string, int> nM, vector<Ligament> lV)
+Skeleton::Skeleton(unordered_map<string, uint32_t> nM, vector<Ligament> lV)
 : nameMap(std::move(nM)), lVec(std::move(lV)), S(1), flip(false){
 	mTransform.clear();
 }
@@ -20,8 +20,8 @@ Skeleton::Skeleton(Drawable * r)
 	mTransform.clear();
 }
 
-vec3 Skeleton::getOrigin(string s, int idx){
-	unordered_map<string, int>::iterator it = nameMap.find(s);
+vec3 Skeleton::getOrigin(string s, uint32_t idx){
+	unordered_map<string, uint32_t>::iterator it = nameMap.find(s);
 	if (it != nameMap.end())
 		return S*lVec[it->second].getOrigin(idx);
 	else
@@ -43,14 +43,14 @@ bool Skeleton::flipped(){
 }
 
 void Skeleton::print(){
-	unordered_map<string, int>::iterator it;
+	unordered_map<string, uint32_t>::iterator it;
 	for (it=nameMap.begin();it!=nameMap.end();it++)
 		cout << it->first << ":\t" << "origin: " << lVec[it->second].getOrigin() << "\t Drawable: " << lVec[it->second].getDrPtr() << "\t" << "Scale: " << S << endl;
 }
 
-void Skeleton::addToRoot(string k, Ligament l, bool invert){//unique_ptr<Drawable> v){
+void Skeleton::addToRoot(string k, Ligament l){
 	lVec.push_back(l);
-	nameMap[k] = lVec[0].addChild(lVec.size()-1, invert);
+	nameMap[k] = lVec[0].addChild(lVec.size()-1);
 }
 
 void Skeleton::setColor(vec3 v){
@@ -70,6 +70,7 @@ void Skeleton::setColor(float r, float g, float b, float a){
 //THIS IS FLAWED: IT WILL ONLY WORK IF sX IS THE 
 //LARGEST DIMENSION. FIX ASAP
 void Skeleton::draw(vec3 pos){
+	
 //	lVec[0].getDrPtr()->uploadColor(mColor);
 	float sX(flip ? -S : S);
 	if (flip) pos.x += S/2.5f;//WHY 2.5?

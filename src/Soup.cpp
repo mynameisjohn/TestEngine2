@@ -174,7 +174,11 @@ Entity loadEntity(TiXmlElement * el, unordered_map<string, unique_ptr<Drawable> 
 													(new Drawable(initObj(fileName, shader))));
 			drPtr = (*dMapPtr)[resName].get();
 			s = Skeleton(drPtr);
-			s.getRoot()->setCurTex("outline");
+			if (!drPtr->addTex(resName, fromImage(IMG_DIR+resName+".png"))){
+				drPtr->addTex("outline", outlineTexture());
+				resName="outline";
+			}	
+			s.getRoot()->setCurTex(resName);//"outline");
 		}
 	}
 

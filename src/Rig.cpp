@@ -66,6 +66,7 @@ void Rig::uploadRigMats(vector<mat4>& R){
 
 //really no different from the Drawable draw
 void Rig::draw(string currentTex, bool rigged){
+	
 	glUniform1i(mShader->getModeHandle(), rigged ? mMode : 0);
 	if (currentTex.length() && texMap.size()){
 		unordered_map<string, GLuint>::iterator it;

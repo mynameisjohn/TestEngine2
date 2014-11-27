@@ -26,17 +26,24 @@ void Drawable::setOrigin(vec4 o){
 	origins.push_back(o);
 }
 
-void Drawable::addTex(string s, GLuint tex){
-	if (texMap.find(s) == texMap.end()){
-		texMap[s] = tex;
-		if (mMode < 0)
-			mMode = 0;
+bool Drawable::addTex(string s, GLuint tex){
+	if (tex){
+		if (texMap.find(s) == texMap.end()){
+			texMap[s] = tex;
+			if (mMode < 0)
+				mMode = 0;
+		}
+		return true;
 	}
+	return false;
 }
 
-void Drawable::addTex(vector<pair<string, GLuint> > texVec){
+bool Drawable::addTex(vector<pair<string, GLuint> > texVec){
+	bool ret(true);
 	for (uint32_t i=0;i<texVec.size();i++)
-      addTex(texVec[i].first, texVec[i].second);
+      if (!addTex(texVec[i].first, texVec[i].second))
+			ret = false;
+	return ret;
 }
 
 void Drawable::setNElements(int n){

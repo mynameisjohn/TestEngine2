@@ -17,8 +17,8 @@ class Drawable{
 		void setNElements(int n);
 		bool isVisible();
 		void setVisibility(bool);
-		void addTex(string s, uint32_t tex);
-		void addTex(vector<pair<string, uint32_t> > texVec);
+		bool addTex(string s, uint32_t tex);
+		bool addTex(vector<pair<string, uint32_t> > texVec);
 		void uploadMV(mat4& MV);
 		void uploadColor(vec4& c);
 		int getNumElems();
