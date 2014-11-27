@@ -88,7 +88,7 @@ bool init(BaseEngine& engine){
       printf( "Error initializing GLEW! %s\n", glewGetErrorString(glewError));
       return false;
    }
-	
+
 	//Use Vsync
    if( SDL_GL_SetSwapInterval(1) < 0 ){
       printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
@@ -101,7 +101,7 @@ bool init(BaseEngine& engine){
    }
 
 	//OpenGL settings
-	glClearColor(1.f, 0.2f, 0.2f, 1.f);
+	glClearColor(.4,.4,.4, 1.f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
