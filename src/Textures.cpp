@@ -13,7 +13,7 @@ uint32_t initTexture(void * PXA, int w, int h){
    glBindTexture(GL_TEXTURE_2D, tex);
 
    //Upload host texture to device
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, PXA);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, PXA);
 
 	//Does this really help?
 	glGenerateMipmap(GL_TEXTURE_2D);

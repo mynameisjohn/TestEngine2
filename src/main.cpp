@@ -11,8 +11,15 @@ void close();
 SDL_Window * gWindow;
 SDL_GLContext gContext;
 
-const std::string vertexShaderSrc = "shaders/simpleVert.glsl";
-const std::string fragShaderSrc = "shaders/simpleFrag.glsl";
+#ifdef __APPLE__
+const std::string vertexShaderSrc = "shaders/mac_vertShader.glsl";
+const std::string fragShaderSrc = "shaders/mac_fragShader.glsl";
+const int glMajor(3), glMinor(3);
+#else
+const std::string vertexShaderSrc = "shaders/vertShader.glsl";
+const std::string fragShaderSrc = "shaders/fragShader.glsl";
+const int glMajor(3), glMinor(0);
+#endif
 
 int main(int argc, char ** argv){
 	BaseEngine engine;
@@ -59,8 +66,8 @@ bool init(BaseEngine& engine){
 	}
 
    //Init SDL+OpenGL Context
-   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, glMajor);
+   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, glMinor);
    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
@@ -101,17 +108,22 @@ bool init(BaseEngine& engine){
    }
 
 	//OpenGL settings
-	glClearColor(.4,.4,.4, 1.f);
+	glClearColor(1,.4,.4,1);
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
 	//glEnable(GL_CULL_FACE); //maybe put this back later...
    glEnable(GL_MULTISAMPLE_ARB);
-	glAlphaFunc(GL_GREATER, 0.8);
+
+	//These are legacy calls valid in OpenGL 3.0 only
+	#ifndef __APPLE__
+	glAlphaFunc(GL_GREATER, 0.9);
 	glEnable(GL_ALPHA_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   
+	#endif
+
+	//For debugging
 	glLineWidth(8.f);
 
 	return true;
