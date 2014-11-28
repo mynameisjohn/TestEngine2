@@ -107,7 +107,6 @@ bool Projectile::isAlive(){
 	return state != DEAD;
 }
 bool Projectile::isPoised(){
-
 	return state == POISED;
 }
 

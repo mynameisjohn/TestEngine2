@@ -2,6 +2,8 @@
 #include <Player.h>
 #include <glm/gtx/transform.hpp>
 
+//do something cute with arrow offset asap
+
 const vec3 speed(40.f, 40.f, 20.f);
 
 //this is a good number to center things around
@@ -153,6 +155,10 @@ void Player::updateMouse(){
 					notched=true;
 					projList.emplace_back(mProj);
 					projList.back().setState(1);
+					vec3 arrowOffset( vec3(0,0,projList.back().getSkeleton()->getScale()/5));
+					projList.back().moveTo(getOrigin("arm1")+arrowOffset+ (mSkel.flipped() ?
+						vec3(-100,-50,0)+projList.back().mSkel.getOrigin() :
+						-projList.back().mSkel.getOrigin()));
 				}
 				projList.back().getSkeleton()->getRoot()->applyTransform(arrowRot);
 				projList.back().translate(lerp(armDraw_m, armDraw_M,charge)*vec3(r,0));
