@@ -5,6 +5,10 @@
 #define GLM_FORCE_RADIANS
 #endif
 
+#ifndef M_PI
+#define M_PI 3.14159f
+#endif
+
 #include <glm/fwd.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <iostream>

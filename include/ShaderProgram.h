@@ -8,6 +8,10 @@
 #include <string>
 #include <fstream>
 
+#ifndef uint32_t
+typedef unsigned __int32 uint32_t;
+#endif
+
 class ShaderProgram
 {
 	public:

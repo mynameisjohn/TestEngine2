@@ -3,6 +3,14 @@
 
 #include <Util.h>
 
+#ifdef near
+#undef near
+#endif
+
+#ifdef far
+#undef far
+#endif
+
 class glmBox{
 public:
 	glmBox();
