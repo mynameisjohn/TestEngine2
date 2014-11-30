@@ -40,7 +40,9 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
    if (!shader.loadProgram())
       return false;
 
-	level = unique_ptr<Level>(new Level(1, shader));
+	level = unique_ptr<Level>(new Level(1, hud, shader, &dMap));
+
+	hud.push_back(dMap["stencil"].get());
 
 	return true;
 }
@@ -53,6 +55,8 @@ void BaseEngine::update(){
 		SDL_GetMouseState(&x,&y);
 		handleMotion((float)x, (float)y);
 	}
+	//cout << level->getPlayer()->getCharge() << endl;
+	hud.update(level->getPlayer());
 }
 
 //figure out a better way to do this
@@ -99,6 +103,8 @@ void BaseEngine::render(){
 	cam.updateProj(shader.getProjHandle());
 	//draw everything
 	level->draw();
+
+	hud.draw(glm::inverse(cam.getProjMat()));
 
 	shader.unbind();
 	motionHandled = false;

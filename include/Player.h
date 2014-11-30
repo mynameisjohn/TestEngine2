@@ -23,15 +23,14 @@ class Player: public ActiveEnt{
 		void takeHit(HitEffect hEff);
 		void setProjectile(Projectile p);
 		bool overlapsWith(Entity * e);
+		float getCharge();
 		EventRegister * getRegPtr();
 	private:
-		//vector<unique_ptr<Projectile> > mProjectiles;
 		list<Projectile> projList;
 		Projectile mProj;
-//		KeyboardHandler mHandler;
 		float mDash;
 		bool jumping;
-		int activeProj;
+		float charge;
 public:
 		EventRegister eReg;
 };

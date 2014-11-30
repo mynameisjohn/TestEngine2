@@ -9,7 +9,6 @@
 
 const vec2 SCREEN_DIM(1200,675);
 
-using glm::mat4;
 
 class Camera{
 	public:

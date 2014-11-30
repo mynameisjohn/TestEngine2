@@ -36,13 +36,9 @@ public:
 	Ligament * operator[](string idx);
 	vec3 getOrigin(string s="", uint32_t idx=0);
 private:
-	//map<string, Ligament> lMap;
-	//Ligament * root;
-	//map<string, Ligament>::iterator itRoot;
 	mat4 MV;
 	vec4 mColor;
 	list<QuatVec> mTransform;
-	//string R;
 	unordered_map<string, uint32_t> nameMap;
 	vector<Ligament> lVec;
 	float S;

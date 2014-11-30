@@ -8,14 +8,13 @@
 class Level{
 public:
 	Level();
-	Level(int l, JShader& shader);
+	Level(int l, Hud& hud, JShader& shader, unordered_map<string, unique_ptr<Drawable> > * dMapPtr);
 	vec4 move();
 	void update();
 	void draw();
 	Player * getPlayer();
 private:
 	vector<unique_ptr<Population> > popVec;
-	unordered_map<string, unique_ptr<Drawable> > dMap;	
 	int activePop;
 
 //	void initWalls(vec3 min, vec3 max, Population * pop, JShader& shader);

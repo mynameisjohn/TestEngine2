@@ -9,7 +9,7 @@ const vec3 speed(40.f, 40.f, 20.f);
 //this is a good number to center things around
 const vec3 offset(100,100,0);
 
-Player::Player() : ActiveEnt(), jumping(false), activeProj(0){
+Player::Player() : ActiveEnt(), jumping(false), charge(0){
 	mSpeed = speed;//vec3(40.f, 30.f, 10.f);
 	mDash = 1.5f;
 	A = 10000.f;	
@@ -18,7 +18,7 @@ Player::Player() : ActiveEnt(), jumping(false), activeProj(0){
 }
 
 Player::Player(const Entity& e)
-: ActiveEnt(e), jumping(false), activeProj(0){
+: ActiveEnt(e), jumping(false), charge(0){
    mSpeed = speed;///vec3(40.f, 30.f, 10.f);
    mDash = 1.5f;
    A = 10000.f;
@@ -37,7 +37,7 @@ Player::Player(const Entity& e)
 }
 
 Player::Player(vec3 translate, vec3 scale)
-: ActiveEnt(translate, scale), jumping(false), activeProj(0){
+: ActiveEnt(translate, scale), jumping(false), charge(0){
 	mSpeed = speed;//vec3(20.f, 40.f, 20.12241f);
 	mDash=1.5f;
 	A = 10000.f;	
@@ -125,7 +125,7 @@ void Player::updateMouse(){
 	vec2 launchOffset( (mSkel.flipped() ? -2 : 1) * 100,250);
 
 	//make non static
-	static float charge(0.f);
+//	static float charge(0.f);
 	static bool charging(false), notched(false);
 	const float dCharge(0.05f), chargeMax(1), notch(0.5);
 
@@ -267,4 +267,8 @@ void Player::setProjectile(Projectile p){
 
 EventRegister * Player::getRegPtr(){
 	return &eReg;
+}
+
+float Player::getCharge(){
+	return charge;
 }

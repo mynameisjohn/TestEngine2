@@ -34,6 +34,22 @@
 		R="0,0,0,1"
 		S="600,600,-20"
 		color="1,1,1,1">
+		<Hud>
+			<Indicator
+				type="chunks"
+				stencil="stencil.png"
+				dim="0.4,0.25"
+				color="1,0,0,1"
+				placement="TOP_LEFT"
+			/>
+			<Indicator 
+				type="bar"
+				stencil="stencil.png"
+				dim="0.4,0.25"
+				color="0,0.5,1,1"
+				placement="TOP_RIGHT"
+			/>
+		</Hud>
 		<Projectile dbg="0"
 			resource="arrow.png"
 			T="0,0,0"

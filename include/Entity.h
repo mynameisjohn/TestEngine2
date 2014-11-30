@@ -44,7 +44,7 @@ class Entity{
 		Collider mCollider;
 		Skeleton mSkel;
 		float sigmaSq, A;
-//		bool flip;
+
 		//friendly grandkids
 		//technically these are class declarations...is that bad?
 		friend class Player;

@@ -17,6 +17,11 @@ Closet::Closet(unordered_map<string, unique_ptr<Drawable> > * dMP, JShader * sha
    }
 
 	//ha ha ha
+	if (dMapPtr->find("stencil") == dMapPtr->end()){
+      unique_ptr<Drawable> drPtr(new Drawable(initTexQuad("stencil.png",*shader)));
+      (*dMapPtr)["stencil"] = move(drPtr);
+   }
+	
 	drFnMap.clear();
 	drFnMap["rig"] = initRigFromSVG; //this one's a problem...
 	drFnMap["png"] = initTexQuad;

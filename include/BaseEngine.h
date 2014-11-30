@@ -21,12 +21,11 @@ public:
 private:
 	Camera cam;
 	JShader shader;
-	//unique_ptr<Population> pop;
-	//Level level;
+	Hud hud;
 	unique_ptr<Level> level;
 	bool motionHandled;
 	void handleMotion(float x, float y);
-//	vector<Drawable> drawables;
+	unordered_map<string, unique_ptr<Drawable> > dMap;
 };
 
 int keyCode(SDL_Event& e);

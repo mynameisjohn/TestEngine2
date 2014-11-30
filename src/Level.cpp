@@ -8,11 +8,11 @@ Level::Level()
 }
 
 //this was segfaulting, and now it isn't. be careful
-Level::Level(int l, JShader& shader)
+Level::Level(int l, Hud& hud, JShader& shader, unordered_map<string, unique_ptr<Drawable> >  * dMapPtr)
 : Level(){
 //this is bogus for now
-	Soup s(&dMap);
-	popVec.push_back(std::move(s.createPopulation(LEVEL_ONE, shader)));
+	Soup s(dMapPtr);
+	popVec.push_back(std::move(s.createPopulation(LEVEL_ONE, hud, shader)));
 }
 
 vec4 Level::move(){

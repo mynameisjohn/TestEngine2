@@ -11,7 +11,7 @@ Entity loadEntity(TiXmlElement * el, unordered_map<string, unique_ptr<Drawable> 
 Collider getCollider(TiXmlElement * collider);
 
 //Retun a unique_ptr to a population given the Level File (XML)
-unique_ptr<Population> Soup::createPopulation(string levelFile, JShader& shader){
+unique_ptr<Population> Soup::createPopulation(string levelFile, Hud& hud, JShader& shader){
 	unique_ptr<Population> pop(nullptr);
 	vector<Obstacle> obsVec;
 	vector<Seeker> seekVec;
@@ -60,6 +60,32 @@ unique_ptr<Population> Soup::createPopulation(string levelFile, JShader& shader)
 				if (el->FirstChildElement("Projectile")){
 					TiXmlElement * projEl = el->FirstChildElement("Projectile");
 					player.setProjectile(Projectile(loadEntity(projEl, dMapPtr, shader)));
+				}
+				if (el->FirstChildElement("Hud")){
+					TiXmlElement * hudEl(el->FirstChildElement("Hud"));
+					for (TiXmlElement * i=hudEl->FirstChildElement("Indicator"); i; i=i->NextSiblingElement("Indicator")){
+						vec2 indDim;
+						vec4 indColor;
+						string type(i->Attribute("type"));
+						string stencilTexture(i->Attribute("stencil"));
+						fillVec(indDim, i->Attribute("dim"));
+						fillVec(indColor, i->Attribute("color"));
+						string place(i->Attribute("placement"));
+						placement p = 
+							place == "TOP_LEFT" ? TOP_LEFT :
+							place == "BOT_LEFT" ? BOT_LEFT :
+							place == "TOP_RIGHT" ? TOP_RIGHT :
+							BOT_RIGHT;
+
+						(*dMapPtr)["quad"]->addTex(stencilTexture, fromImage(IMG_DIR+stencilTexture));
+
+						if (type == "chunks")
+							hud.addIndicator(move(unique_ptr<Indicator>(
+								new Ind_Chunks(indDim,indColor,stencilTexture,(*dMapPtr)["quad"].get(), p, 3,1,1))));
+						if (type == "bar")
+							hud.addIndicator(move(unique_ptr<Indicator>(
+								new Ind_Bar(indDim,indColor,stencilTexture,(*dMapPtr)["quad"].get(), p))));
+					}
 				}
 				playerExists = true;
 			}

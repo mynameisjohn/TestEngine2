@@ -60,6 +60,8 @@ void Drawable::draw(string currentTex){//, vec4 color){
 			glBindTexture(GL_TEXTURE_2D,it->second);
 			mode = 0;
 		}
+		else
+			cout << "Drawable: Texture not found: " << currentTex << endl;
 	}
 	
 	glUniform1i(mShader->getModeHandle(), mode);
