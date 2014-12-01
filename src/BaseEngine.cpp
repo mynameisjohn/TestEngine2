@@ -97,7 +97,7 @@ void BaseEngine::handleEvent(SDL_Event& e){
 
 void BaseEngine::render(){
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	shader.bind();
+   bindShader();
 
 	//send projection matrix to device
 	cam.updateProj(shader.getProjHandle());
@@ -106,7 +106,7 @@ void BaseEngine::render(){
 
 	hud.draw(glm::inverse(cam.getProjMat()));
 
-	shader.unbind();
+	unBindShader();
 	motionHandled = false;
 }
 
@@ -133,4 +133,24 @@ void BaseEngine::handleMotion(float x, float y){
 	//send it to the event register
 	eReg->handleMotion(vec2(worldMouse));
 	motionHandled = true;
+}
+
+Drawable * BaseEngine::getDrawablePtr(string name){
+	return dMap[name].get();
+}
+
+mat4 BaseEngine::getProjMat(){
+	return cam.getProjMat();
+}
+
+void BaseEngine::bindShader(){
+	shader.bind();
+}
+
+void BaseEngine::unBindShader(){
+	shader.unbind();
+}
+
+void BaseEngine::updateProjMat(){
+	cam.updateProj(shader.getProjHandle());
 }

@@ -18,6 +18,11 @@ public:
 	void move();
 	void render();
 	void handleEvent(SDL_Event& e);
+	void bindShader();
+	void unBindShader();
+	void updateProjMat();
+	Drawable * getDrawablePtr(string name);
+	mat4 getProjMat();
 private:
 	Camera cam;
 	JShader shader;

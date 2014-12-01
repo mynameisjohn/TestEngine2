@@ -1,8 +1,10 @@
 
 #include <GL_Includes.h>
+#include <glm/gtx/transform.hpp>
 
 #include <SDL_image.h>
 
+#include <Textures.h>
 #include <BaseEngine.h>
 
 bool init(BaseEngine& engine);
@@ -21,6 +23,88 @@ const std::string fragShaderSrc = "shaders/fragShader.glsl";
 const int glMajor(3), glMinor(0);
 #endif
 
+int escapeTest(Drawable * quadPtr, mat4 proj){
+	bool quit(false);
+	SDL_Event e;
+
+	SDL_Surface * screen(SDL_GetWindowSurface(gWindow));
+	GLuint tex(fromSDLSurface(screen));
+
+	quadPtr->addTex("screen", tex);
+	vec4 color(0,1,0,1);
+	mat4 mv(glm::inverse(proj));
+	
+
+	while (!quit){
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		while (SDL_PollEvent(&e) != 0){
+			if (e.type == SDL_QUIT)
+				return SDL_QUIT;
+			if (e.type == SDL_QUIT || (e.key.keysym.sym == SDLK_ESCAPE && e.type == SDL_KEYDOWN))
+				quit = true;
+		}
+		float x(e.motion.x), y(e.motion.y);
+		quadPtr->uploadMV(mv);
+		quadPtr->uploadColor(color);
+		quadPtr->draw("screen");
+		SDL_GL_SwapWindow(gWindow);
+	}
+
+	/*
+		1. Create screen sized texture object, null
+		2. Create FBO, attach screen texture
+		3. Copy back buffer to new FBO
+		4. 
+	*/
+
+	
+
+	glDeleteTextures(1, &tex);
+
+	return 0;
+
+	/*
+	GLuint fbo(0);
+	glGenFramebuffers(1, &fbo);
+
+	GLuint screenTex(0);
+	glGenTextures(1, &screenTex);
+	glBindTexture(GL_TEXTURE_2D, screenTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCREEN_DIM.x, SCREEN_DIM.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	//Bind, attach
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTex, 0);
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status == GL_FRAMEBUFFER_COMPLETE)
+		printf("good\n");
+	else
+		printf("bad\n");
+
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+	glBlitFramebuffer(0, 0, SCREEN_DIM.x, SCREEN_DIM.y, 0, 0, SCREEN_DIM.x, SCREEN_DIM.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+	quadPtr->addTex("screen", screenTex);
+	vec4 color(1);
+	mat4 MV = glm::inverse(proj);
+	quadPtr->uploadColor(color);
+	quadPtr->uploadMV(MV);
+	quadPtr->draw();
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDeleteFramebuffers(1, &fbo);
+	glDeleteTextures(1, &screenTex);
+	*/
+}
+
 int main(int argc, char ** argv){
 	BaseEngine engine;
 	//Initialize Everything
@@ -38,6 +122,61 @@ int main(int argc, char ** argv){
 		while (SDL_PollEvent(&e) != 0){
 			if (e.type == SDL_QUIT)
 				quit = true;
+			else if (e.key.keysym.sym == SDLK_ESCAPE && e.type == SDL_KEYDOWN){
+				GLuint tex(0), fbo(0), downSample(4);
+				glGenTextures(1, &tex);
+				glBindTexture(GL_TEXTURE_2D, tex);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, SCREEN_DIM.x / downSample, SCREEN_DIM.y / downSample, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+				glBindTexture(GL_TEXTURE_2D, 0);
+				
+
+				glGenFramebuffers(1, &fbo);
+				glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+
+				glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+				glBlitFramebuffer(0, 0, SCREEN_DIM.x, SCREEN_DIM.y, 0, SCREEN_DIM.y / downSample, SCREEN_DIM.x / downSample, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+
+				//Put this somewhere else
+				GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+				if (status == GL_FRAMEBUFFER_COMPLETE){
+					glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+					bool Quit(false);
+					SDL_Event E;
+					Drawable * quadPtr = engine.getDrawablePtr("quad");
+					quadPtr->addTex("screen", tex);
+					vec4 color(1);
+					mat4 mv(glm::inverse(engine.getProjMat())*glm::translate(vec3(-1, -1, 0))*glm::scale(vec3(2, 2, 1)));
+			
+
+					while (!Quit){
+						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+						while (SDL_PollEvent(&E) != 0){
+							if (E.key.keysym.sym == SDLK_ESCAPE && E.type == SDL_KEYDOWN)
+								Quit = true;
+						}
+						engine.bindShader();
+						quadPtr->uploadMV(mv);
+						quadPtr->uploadColor(color);
+						quadPtr->draw("screen");
+						engine.unBindShader();
+						SDL_GL_SwapWindow(gWindow);
+					}
+				}
+				else
+					cout << "Bad" << endl;
+				glDeleteTextures(1, &tex);
+				glDeleteFramebuffers(1, &fbo);
+				
+
+			}
 			engine.handleEvent(e);
 		}
 		engine.move();

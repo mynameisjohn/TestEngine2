@@ -1,6 +1,13 @@
 #include <Hud.h>
 #include <glm/gtx/transform.hpp>
 
+/*
+TO DO:
+	- Make everything less wordy, i.e how the matrices are formed. 
+	- Speaking of matrices, add a branch to the shader designed for world space
+	  (this will be useful for the menu as well)
+*/
+
 mat4 getPlacementMat(placement p, vec2 scale){
 	vec3 translate;
 	scale = glm::abs(scale);

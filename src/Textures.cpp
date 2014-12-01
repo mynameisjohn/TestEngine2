@@ -42,19 +42,28 @@ vector<uint32_t> fromFileList(vector<string> files){
 	return ret;
 }
 
+uint32_t fromSDLSurface(SDL_Surface * s){
+	if (!s){
+		cout << "Invalid SDL Surface" << endl;
+		return 0;//This is bad
+	}
+	GLuint tex = initTexture(s->pixels, s->w, s->h);
+
+	//Unbind, Delete the host texture, return handle to device texture
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return (uint32_t)tex;
+}
 
 uint32_t fromImage(string fileName){
 	GLuint tex(0);
 	SDL_Surface * s = IMG_Load(fileName.c_str());
-	if (!s){
+	tex = fromSDLSurface(s);
+	if (!tex){
 		cout << "Failed to load texture " << fileName << endl;
 		return 0;//This is bad
 	}
-	tex = initTexture(s->pixels, s->w, s->h);
-
-   //Unbind, Delete the host texture, return handle to device texture
-	glBindTexture(GL_TEXTURE_2D, 0);
-   SDL_FreeSurface(s);
+	SDL_FreeSurface(s);
 	
    return (uint32_t)tex;
 }
