@@ -15,7 +15,7 @@ class Menu{
 	Drawable * drPtr;
 public:
 	Menu();
-	Menu(Drawable * base, uint32_t w, uint32_t h, uint32_t dS = 4);
+	Menu(Drawable * base, uint32_t w, uint32_t h, uint32_t dS = 1);
 	bool isFBOComplete();
 	bool grabScreen(uint32_t w, uint32_t h);
 	MenuState handleEvent(SDL_Event& e);

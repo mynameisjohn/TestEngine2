@@ -14,6 +14,7 @@ void close();
 SDL_Window * gWindow;
 SDL_GLContext gContext;
 
+//Apple demands OpenGL 3.3, and needs more modern shaders
 #ifdef __APPLE__
 const std::string vertexShaderSrc = "shaders/mac_vertShader.glsl";
 const std::string fragShaderSrc = "shaders/mac_fragShader.glsl";
@@ -32,28 +33,63 @@ int main(int argc, char ** argv){
       return EXIT_FAILURE;
    }
 
+	//different loop states
 	enum state{
 		STATE_QUIT,
 		STATE_GAME,
 		STATE_MENU
 	};
 
-	//polling boolean, key event, sub thread
-	bool quit = false;
+	//Game state, main event struct, Menu object
 	state s(STATE_GAME);
 	SDL_Event e;
-	Menu menu(engine.getDrawablePtr("quad"),SCREEN_DIM.x, SCREEN_DIM.y);
+	Menu menu(engine.getDrawablePtr("quad"),SCREEN_DIM.x, SCREEN_DIM.y, 4);
 
+	//While the state hasn't been set to quit
 	while (s != STATE_QUIT){
+		//Check for events
+		while (SDL_PollEvent(&e)){
+			if (e.type == SDL_QUIT)
+				s = STATE_QUIT;
+			else{ //If Escape is pressed for the first time, and we aren't in Menu
+				if (e.key.keysym.sym == SDLK_ESCAPE && e.type == SDL_KEYDOWN && 
+					 e.key.repeat == 0 && s != STATE_MENU){
+					//Set state to Menu, grab currect screen for background
+					s = STATE_MENU;
+					menu.grabScreen(SCREEN_DIM.x, SCREEN_DIM.y);
+				}//Otherwise, if we're in menu
+				else if (s == STATE_MENU){
+					//Depending on what the event is
+					switch(menu.handleEvent(e)){
+						case MENU_CONTINUE: //Stay in Menu
+							break;
+						case MENU_RESUME: //Resume game
+							s = STATE_GAME;
+							break;
+						case MENU_QUIT: //Quit
+						default:
+							s = STATE_QUIT;
+							break;
+					}
+				}
+				//Engine just stays aware of the keyboard (MOVE OUT EVENT_REGISTER)
+				engine.handleEvent(e);//I don't like this because motion is expensive
+			}
+		}
+
+		//Clear OpenGL Buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//Depending on state
 		switch(s){
+			//Let the engine do its thing
 			case STATE_GAME:
 				engine.move();
 				engine.update();
 				engine.render();
 				break;
 			case STATE_MENU:
+				//Let the menu do its thing (MOVE SHADER INTO MENU ASAP)
 				menu.update();
 				engine.bindShader();
 				menu.render(glm::inverse(engine.getProjMat()));
@@ -63,99 +99,10 @@ int main(int argc, char ** argv){
 				break;
 		}
 
-		while (SDL_PollEvent(&e)){
-			if (e.type == SDL_QUIT)
-				s = STATE_QUIT;
-			else{
-				if (e.key.keysym.sym == SDLK_ESCAPE && e.type == SDL_KEYDOWN && 
-					 e.key.repeat == 0 && s != STATE_MENU){
-					s = STATE_MENU;
-					menu.grabScreen((uint32_t)SCREEN_DIM.x, (uint32_t)SCREEN_DIM.y);
-				}
-				else if (s == STATE_MENU){
-					MenuState me(menu.handleEvent(e));
-					switch(me){
-						case MENU_CONTINUE:
-							break;
-						case MENU_RESUME:
-							s = STATE_GAME;
-							break;
-						case MENU_QUIT:
-						default:
-							s = STATE_QUIT;
-							break;
-					}
-				}
-//				else //This prevents some bugs WRT they menu and keystate
-				engine.handleEvent(e);//I don't like this because motion is expensive
-			}
-		}
-
+		//Swap window buffers
 		SDL_GL_SwapWindow(gWindow);
 	}
-
-/*
-	//main event loop
-	while (!quit){
-		while (SDL_PollEvent(&e) != 0){
-			if (e.type == SDL_QUIT)
-				quit = true;
-			else if (e.key.keysym.sym == SDLK_ESCAPE && e.type == SDL_KEYDOWN){
-				GLuint tex(0), fbo(0), downSample(4);
-				tex = initTexture(NULL, SCREEN_DIM.x/downSample, SCREEN_DIM.y/downSample);				
-
-				glGenFramebuffers(1, &fbo);
-				glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
-
-				glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
-				glBlitFramebuffer(0, 0, SCREEN_DIM.x, SCREEN_DIM.y, 0, SCREEN_DIM.y / downSample, SCREEN_DIM.x / downSample, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-
-				//Put this somewhere else
-				GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-				if (status == GL_FRAMEBUFFER_COMPLETE){
-					glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-					bool Quit(false);
-					SDL_Event E;
-					Drawable * quadPtr = engine.getDrawablePtr("quad");
-					quadPtr->addTex("screen", tex);
-					vec4 color(1);
-					mat4 mv(glm::inverse(engine.getProjMat())*glm::translate(vec3(-1, -1, 0))*glm::scale(vec3(2, 2, 1)));
-			
-
-					while (!Quit){
-						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-						while (SDL_PollEvent(&E) != 0){
-							if (E.key.keysym.sym == SDLK_ESCAPE && E.type == SDL_KEYDOWN)
-								Quit = true;
-						}
-						engine.bindShader();
-						quadPtr->uploadMV(mv);
-						quadPtr->uploadColor(color);
-						quadPtr->draw("screen");
-						engine.unBindShader();
-						SDL_GL_SwapWindow(gWindow);
-					}
-				}
-				else
-					cout << "Bad" << endl;
-				glDeleteTextures(1, &tex);
-				glDeleteFramebuffers(1, &fbo);
-				
-
-			}
-			engine.handleEvent(e);
-		}
-		engine.move();
-		engine.update();
-		engine.render();
-		
-		SDL_GL_SwapWindow(gWindow);
-	}
-*/
+	//After loop, close up shop
 	close();
 
 	return EXIT_SUCCESS;
