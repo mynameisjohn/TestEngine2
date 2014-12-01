@@ -4,6 +4,7 @@
 #include <vector>
 #include <SDL.h>
 
+uint32_t initTexture(void * PXA, int w, int h);
 uint32_t fromImage(std::string fileName);
 uint32_t outlineTexture(bool invert = false);
 uint32_t fromSDLSurface(SDL_Surface * s);

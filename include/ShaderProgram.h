@@ -8,7 +8,7 @@
 #include <string>
 #include <fstream>
 
-#ifndef uint32_t
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 typedef unsigned __int32 uint32_t;
 #endif
 
