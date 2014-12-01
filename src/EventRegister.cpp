@@ -12,12 +12,16 @@ void EventRegister::toggleRMB(){
 	rmb = !rmb;
 }
 
-void EventRegister::handleKey(int k){
-	keyHandler.handleKey(k);
+void EventRegister::handleKey(int k, bool down){
+	keyHandler.handleKey(k, down);
 }
 
 void EventRegister::handleMotion(vec2 ms){
 	worldMouse = ms;
+}
+
+void EventRegister::clearKeyState(){
+	keyHandler.clear();
 }
 
 int EventRegister::getKeyState(int k){

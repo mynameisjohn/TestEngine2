@@ -11,11 +11,11 @@ public:
 	EventRegister();
 	void toggleLMB();
 	void toggleRMB();
-	void handleKey(int k);
+	void handleKey(int k, bool down);
 	void handleMotion(vec2 ms);
+	void clearKeyState();
 	int getKeyState(int k);
 	vec2 getWorldMouse();
-
 private:
 	bool lmb, rmb;
 	vec2 worldMouse;

@@ -66,14 +66,13 @@ void BaseEngine::move(){
 }
 //Try and get SDL out of the picture
 void BaseEngine::handleEvent(SDL_Event& e){
-	//EventRegister * eReg = pop->getPlayer()->getRegPtr();
 	EventRegister * eReg = level->getPlayer()->getRegPtr();
 
 	switch (e.type){
 		case SDL_KEYUP:
 		case SDL_KEYDOWN:
 			if (!e.key.repeat)
-				eReg->handleKey(keyCode(e));
+				eReg->handleKey(keyCode(e), e.type==SDL_KEYDOWN);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
@@ -96,7 +95,7 @@ void BaseEngine::handleEvent(SDL_Event& e){
 }
 
 void BaseEngine::render(){
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    bindShader();
 
 	//send projection matrix to device
@@ -145,6 +144,10 @@ mat4 BaseEngine::getProjMat(){
 
 void BaseEngine::bindShader(){
 	shader.bind();
+}
+
+void BaseEngine::clearKeyState(){
+	level->getPlayer()->getRegPtr()->clearKeyState();
 }
 
 void BaseEngine::unBindShader(){

@@ -9,8 +9,8 @@ class KeyboardHandler{
 public:
 	KeyboardHandler();
 	int getKeyState(int);
-	void handleKey(int);
-
+	void handleKey(int, bool);
+	void clear();
 private:
 	std::vector<bool> keyState;
 };

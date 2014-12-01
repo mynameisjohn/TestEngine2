@@ -2,7 +2,7 @@
 #include <GL_Includes.h>
 
 #include <SDL_image.h>
-
+#include <Menu.h>
 #include <Textures.h>
 #include <BaseEngine.h>
 
@@ -32,10 +32,69 @@ int main(int argc, char ** argv){
       return EXIT_FAILURE;
    }
 
+	enum state{
+		STATE_QUIT,
+		STATE_GAME,
+		STATE_MENU
+	};
+
 	//polling boolean, key event, sub thread
 	bool quit = false;
+	state s(STATE_GAME);
 	SDL_Event e;
+	Menu menu(engine.getDrawablePtr("quad"),SCREEN_DIM.x, SCREEN_DIM.y);
 
+	while (s != STATE_QUIT){
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		switch(s){
+			case STATE_GAME:
+				engine.move();
+				engine.update();
+				engine.render();
+				break;
+			case STATE_MENU:
+				menu.update();
+				engine.bindShader();
+				menu.render(glm::inverse(engine.getProjMat()));
+				engine.unBindShader();
+			case STATE_QUIT:
+			default:
+				break;
+		}
+
+		while (SDL_PollEvent(&e)){
+			if (e.type == SDL_QUIT)
+				s = STATE_QUIT;
+			else{
+				if (e.key.keysym.sym == SDLK_ESCAPE && e.type == SDL_KEYDOWN && 
+					 e.key.repeat == 0 && s != STATE_MENU){
+					s = STATE_MENU;
+					menu.grabScreen((uint32_t)SCREEN_DIM.x, (uint32_t)SCREEN_DIM.y);
+				}
+				else if (s == STATE_MENU){
+					MenuState me(menu.handleEvent(e));
+					switch(me){
+						case MENU_CONTINUE:
+							break;
+						case MENU_RESUME:
+							s = STATE_GAME;
+							break;
+						case MENU_QUIT:
+						default:
+							s = STATE_QUIT;
+							break;
+					}
+				}
+//				else //This prevents some bugs WRT they menu and keystate
+				engine.handleEvent(e);//I don't like this because motion is expensive
+			}
+		}
+
+		SDL_GL_SwapWindow(gWindow);
+	}
+
+/*
 	//main event loop
 	while (!quit){
 		while (SDL_PollEvent(&e) != 0){
@@ -96,6 +155,7 @@ int main(int argc, char ** argv){
 		
 		SDL_GL_SwapWindow(gWindow);
 	}
+*/
 	close();
 
 	return EXIT_SUCCESS;

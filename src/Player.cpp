@@ -64,8 +64,8 @@ char Player::moveWRT_ent(Entity * e){
 
 //Overridden move to handle projectile movement
 void Player::move(){
-	list<Projectile>::iterator pIt;
-	for (pIt=projList.begin();pIt!=projList.end();pIt++){
+	list<Projectile>::iterator pIt(projList.begin());
+	while (pIt != projList.end()){
 		if (pIt->isPoised()){//this crap...works for now
 			//arrowOffset moves it behind the hand, the rest is positioning
 			vec3 arrowOffset( vec3(0,0,pIt->getSkeleton()->getScale()/5));
@@ -75,6 +75,7 @@ void Player::move(){
 		}
 		else if (pIt->isActive())
 			pIt->move();
+		pIt++;
 	}
 	ActiveEnt::move();
 }
