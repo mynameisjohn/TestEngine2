@@ -2,7 +2,32 @@
 #define MENU_H
 
 #include <SDL.h>
+
 #include <Drawable.h>
+#include <BoundRect.h>
+#include <set>
+
+enum ButtonState{
+	BUT_MouseOver = 1,
+	BUT_RightClicked = 2,
+	BUT_LeftClicked = 4,
+	BUT_MiddleClicked = 8
+};
+
+class Button{
+	BoundRect rect;
+	set<ButtonState> state;
+public:
+	Button();
+	Button(vec2 dim);
+	Button(vec2 pos, vec2 dim);
+	void moveTo(vec2 pos);
+	void clearState();
+	void addToState(ButtonState bS);
+	void removeFromState(ButtonState bS);
+	bool containsState(ButtonState bS);
+	BoundRect getRect();
+};
 
 enum MenuState{
 	MENU_QUIT,
@@ -13,9 +38,13 @@ enum MenuState{
 class Menu{
 	uint32_t FBO, tex, downSample;
 	Drawable * drPtr;
+	vector<Button> buttons;
 public:
 	Menu();
 	Menu(Drawable * base, uint32_t w, uint32_t h, uint32_t dS = 1);
+	void push_back(Button b);
+	void emplace_back(vec2 pos, vec2 dim);
+	void clearButtons();
 	bool isFBOComplete();
 	bool grabScreen(uint32_t w, uint32_t h);
 	MenuState handleEvent(SDL_Event& e);
