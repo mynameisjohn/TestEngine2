@@ -81,6 +81,10 @@ void Player::move(){
 }
 
 void Player::update(){//EventInfo evInfo){
+	static float osc(0.f);
+	health = 75.f+75.f*sin(osc);
+	osc += 0.01f;
+
 	if (grounded){
 		mVel.y=0.f;
 		eReg.worldMouse.x += mVel.x;

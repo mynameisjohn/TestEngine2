@@ -1,3 +1,6 @@
+#ifndef BASEENGINE_H
+#define BASEENGINE_H
+
 #include <Drawable.h>
 #include <Camera.h>
 #include <JShader.h>
@@ -13,7 +16,7 @@ class BaseEngine{
 public:
 	BaseEngine();
 	~BaseEngine();
-	bool init(std::string vs, std::string fs);
+	bool init(std::string vs, std::string fs, vec2 screenDim);
 	void update();
 	void move();
 	void render();
@@ -22,6 +25,7 @@ public:
 	void unBindShader();
 	void updateProjMat();
 	void clearKeyState();
+	vec2 getScreenDim();
 	Drawable * getDrawablePtr(string name);
 	mat4 getProjMat();
 private:
@@ -35,24 +39,5 @@ private:
 };
 
 int keyCode(SDL_Event& e);
-/*
-bool initGL();
 
-bool initLevel();
-
-Drawable initQuad();
-
-int update(void * data);
-
-void move();
-
-void closeShader();
-
-void handleEvent(SDL_Event& e);
-
-void render();
-
-void initPlayer();
-
-void initObstacle(int x, int y);
-*/
+#endif

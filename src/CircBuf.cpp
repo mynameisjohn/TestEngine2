@@ -13,7 +13,7 @@ CircBuf<T>::CircBuf(int dim){
 template <class T>
 CircBuf<T>::CircBuf(std::vector<T> in)
 : CircBuf(in.size()){
-	for (int i=0;i<in.size();i++)
+	for (uint32_t i=0;i<in.size();i++)
 		add(in[i]);
 	cout << idx << endl;
 }

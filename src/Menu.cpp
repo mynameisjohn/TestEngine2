@@ -50,10 +50,10 @@ BoundRect Button::getRect(){
 Menu::Menu(){
 }
 
-Menu::Menu(Drawable * base, uint32_t w, uint32_t h, uint32_t dS)
+Menu::Menu(Drawable * base, vec2 screenDim, uint32_t dS)
 : FBO(0), tex(0), downSample(dS), drPtr(base){
 	//Generate blank texture, add it to drawable
-	tex = initTexture(NULL, w/downSample, h/downSample);
+	tex = initTexture(NULL, screenDim.x/downSample, screenDim.y/downSample);
 	drPtr->addTex("screen", tex);
 
 	//Generate Frame buffer and attach texture
@@ -64,6 +64,7 @@ Menu::Menu(Drawable * base, uint32_t w, uint32_t h, uint32_t dS)
 	//Rebind back buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	//button crap
 	vec2 bDim(0.2, 0.1), bPos;
 	emplace_back(bPos - bDim / 2.f, bDim);
 }
@@ -89,8 +90,7 @@ bool Menu::isFBOComplete(){
 }
 
 //Handle motion
-MenuState Menu::handleEvent(SDL_Event& e){
-	
+MenuState Menu::handleEvent(SDL_Event& e, vec2 screenDim){	
 	ButtonState bS(BUT_MouseOver);
 	bool clear(false);
 	switch (e.type){
@@ -115,7 +115,7 @@ MenuState Menu::handleEvent(SDL_Event& e){
 	//This should be centered
 	float x(e.motion.x), y(e.motion.y);
 	const vec2 m1(0, 1), m2(1, 0), m3(-1, -1), m4(1, 1);
-	vec2 mousePos = remap(vec2(x, y) / SCREEN_DIM, m1, m2, m3, m4);//fix this
+	vec2 mousePos = remap(vec2(x, y) / screenDim, m1, m2, m3, m4);
 
 	const vec2 mouseSize(.05);
 	BoundRect mouseRect(mousePos, mouseSize);
@@ -125,41 +125,57 @@ MenuState Menu::handleEvent(SDL_Event& e){
 		if (bIt->getRect().collidesWith(mouseRect))
 			if (clear)
 				bIt->removeFromState(bS);
-			else
+			else{
 				bIt->addToState(bS);
-		else
+				if (bS == BUT_LeftClicked){
+					if (bIt->containsState(BUT_Toggled))
+						bIt->removeFromState(BUT_Toggled);
+					else
+						bIt->addToState(BUT_Toggled);
+				}
+			}
+		else{//Please make this bitwise
+			bool toggled(bIt->containsState(BUT_Toggled));
 			bIt->clearState();
+			if (toggled) bIt->addToState(BUT_Toggled);
+		}
 	}
 
 	return MENU_CONTINUE;
 }
 
+//This should return something...
 uint32_t Menu::update(){
-	//vector<Button>::iterator bIt;
-	//for (bIt = buttons.begin(); bIt != buttons.end(); bIt++){
-	//	cout << "Button State: ";
-	//	if (bIt->containsState(BUT_LeftClicked))
-	//		cout << "Left Clicked\t";
-	//	if (bIt->containsState(BUT_RightClicked))
-	//		cout << "Right Clicked\t";
-	//	if (bIt->containsState(BUT_MouseOver))
-	//		cout << "Mouse Over\t";
-	//	if (bIt->containsState(BUT_MiddleClicked))
-	//		cout << "Middle Clicked\t";
-	//	cout << endl;
-	//}
+
+	vector<Button>::iterator bIt;
+		for (bIt = buttons.begin(); bIt != buttons.end(); bIt++){
+		cout << "Button State: ";
+		if (bIt->containsState(BUT_LeftClicked))
+			cout << "Left Clicked\t";
+		if (bIt->containsState(BUT_RightClicked))
+			cout << "Right Clicked\t";
+		if (bIt->containsState(BUT_MouseOver))
+			cout << "Mouse Over\t";
+		if (bIt->containsState(BUT_MiddleClicked))
+			cout << "Middle Clicked\t";
+		if (bIt->containsState(BUT_Toggled))
+			cout << "Button Toggled\t";
+		cout << endl;
+	}
 
 	//Handle mouse clicks, hovers, etc
 	return (uint32_t)isFBOComplete();
 }
 
 //Grab screen and blit it into our FBO Texture
-bool Menu::grabScreen(uint32_t w, uint32_t h){
+bool Menu::grabScreen(vec2 screenDim){
 	//Bind Read and Draw buffers for Blit
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FBO);
 	//Blit with downsampling for fun
-	glBlitFramebuffer(0, 0, w, h, 0, h / downSample, w / downSample, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	glBlitFramebuffer(0, 0, screenDim.x, screenDim.y,
+							0, screenDim.y/downSample, screenDim.x/downSample, 0
+							,GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	//Return back buffer into the default slot
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -168,27 +184,32 @@ bool Menu::grabScreen(uint32_t w, uint32_t h){
 
 //Render (MAKE A NEW SHADER FOR THIS ASAP)
 uint32_t Menu::render(mat4 pInv){
+	//First draw downsampled screen, as background
 	mat4 MV(pInv*glm::translate(vec3(-1, -1, 0))*glm::scale(vec3(2, 2, 1)));
 	vec4 color(1);
 	drPtr->uploadMV(MV);
 	drPtr->uploadColor(color);
 	drPtr->draw("screen");
 
+	//Then draw a black rectangle, to serve as bas for the menu
 	MV = pInv*glm::translate(vec3(-.75, -.75, -0.05))*glm::scale(vec3(1.5,1.5,1));
 	color = vec4(0.1,0.1,0.1,.93);
 	drPtr->uploadMV(MV);
 	drPtr->uploadColor(color);
 	drPtr->draw();
 
+	//Then draw all buttons
 	vector<Button>::iterator bIt;
 	for (bIt = buttons.begin(); bIt != buttons.end(); bIt++){
 		BoundRect rect(bIt->getRect());
 		MV = pInv*glm::translate(vec3(rect.getPos(),-.071)) * glm::scale(vec3(rect.getDim(),1));
-		color = bIt->containsState(BUT_RightClicked) ? vec4(vec3(0.5),1) : bIt->containsState(BUT_LeftClicked) ? vec4(1) : vec4(vec3(.02), 1);
+		color = bIt->containsState(BUT_RightClicked) ? vec4(vec3(0.5),1) : 
+				  bIt->containsState(BUT_LeftClicked) ? vec4(1) : 
+				  bIt->containsState(BUT_Toggled) ? vec4(1,0,0,1) :
+				  vec4(vec3(.02), 1);
 		drPtr->uploadMV(MV);
 		drPtr->uploadColor(color);
-		drPtr->draw();
-		
+		drPtr->draw("fontTest");
 	}
 
 	return (uint32_t)isFBOComplete();

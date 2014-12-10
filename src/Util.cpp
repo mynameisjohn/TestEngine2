@@ -109,6 +109,36 @@ float lerp(float x, float y, float a){
 	return x*(1.f-a)+a*y;
 }
 
+uint32_t getRGBAInt(vec4 c){
+	uint32_t ret(0);
+	uint8_t r,g,b,a;
+	
+	c = glm::clamp(c, vec4(), vec4(1));
+	c *= 255.f;
+	r = (uint8_t)c.x;
+	g = (uint8_t)c.y;
+	b = (uint8_t)c.z;
+	a = (uint8_t)c.w;
+	
+	ret = (r << 24) | (g << 16) | (b << 8) | a;
+	return ret;	
+}
+
+uint32_t getRGBAInt(vec3 c){
+	uint32_t ret(0);
+	uint8_t r,g,b,a;
+	
+	c = glm::clamp(c, vec3(), vec3(1));
+	c *= 255.f;
+	r = (uint8_t)c.x;
+	g = (uint8_t)c.y;
+	b = (uint8_t)c.z;
+	a = 0xFF;
+	
+	ret = (r << 24) | (g << 16) | (b << 8) | a;
+	return ret;	
+}
+
 mat4 getAlignMat(vec3 x, vec3 y, vec3 z){
 	return glm::transpose(mat4(vec4(glm::normalize(x),0), 
 										vec4(glm::normalize(y),0), 

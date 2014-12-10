@@ -117,3 +117,11 @@ char ActiveEnt::moveWRT_ent(Entity * e){
 char ActiveEnt::isGrounded(){
 	return grounded;
 }
+
+Status ActiveEnt::getStatus(){
+	return {health, mSpeed};
+}
+
+float ActiveEnt::getHealth(){
+	return health;
+}

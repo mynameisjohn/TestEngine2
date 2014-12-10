@@ -1,29 +1,11 @@
+#include <main.h>
 
 #include <GL_Includes.h>
-
 #include <SDL_image.h>
-#include <Menu.h>
-#include <Textures.h>
-#include <BaseEngine.h>
-
+#include <SDL_ttf.h>
 #include <glm/gtx/transform.hpp>
 
-bool init(BaseEngine& engine);
-void close();
-
-SDL_Window * gWindow;
-SDL_GLContext gContext;
-
-//Apple demands OpenGL 3.3, and needs more modern shaders
-#ifdef __APPLE__
-const std::string vertexShaderSrc = "shaders/mac_vertShader.glsl";
-const std::string fragShaderSrc = "shaders/mac_fragShader.glsl";
-const int glMajor(3), glMinor(3);
-#else
-const std::string vertexShaderSrc = "shaders/vertShader.glsl";
-const std::string fragShaderSrc = "shaders/fragShader.glsl";
-const int glMajor(3), glMinor(0);
-#endif
+#include <tinyxml.h>
 
 int main(int argc, char ** argv){
 	BaseEngine engine;
@@ -43,7 +25,7 @@ int main(int argc, char ** argv){
 	//Game state, main event struct, Menu object
 	state s(STATE_GAME);
 	SDL_Event e;
-	Menu menu(engine.getDrawablePtr("quad"),SCREEN_DIM.x, SCREEN_DIM.y, 4);
+	Menu menu(engine.getDrawablePtr("quad"),engine.getScreenDim(), 4);
 
 	//While the state hasn't been set to quit
 	while (s != STATE_QUIT){
@@ -56,11 +38,11 @@ int main(int argc, char ** argv){
 					 e.key.repeat == 0 && s != STATE_MENU){
 					//Set state to Menu, grab currect screen for background
 					s = STATE_MENU;
-					menu.grabScreen(SCREEN_DIM.x, SCREEN_DIM.y);
+					menu.grabScreen(engine.getScreenDim());
 				}//Otherwise, if we're in menu
 				else if (s == STATE_MENU){
 					//Depending on what the event is
-					switch(menu.handleEvent(e)){
+					switch(menu.handleEvent(e,engine.getScreenDim())){
 						case MENU_CONTINUE: //Stay in Menu
 							break;
 						case MENU_RESUME: //Resume game
@@ -122,6 +104,11 @@ bool init(BaseEngine& engine){
       return false;
 	}
 
+	if (TTF_Init() < 0){
+		cout << "SDL_TTF could not initialize! Error: " << TTF_GetError() << endl;
+		return false;
+	}
+	
    //Init SDL+OpenGL Context
    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, glMajor);
    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, glMinor);
@@ -129,9 +116,8 @@ bool init(BaseEngine& engine){
    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
    //Create Window
-   gWindow = SDL_CreateWindow("3D Test",
-                              SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                              SCREEN_DIM.x, SCREEN_DIM.y, //SCREEN_WIDTH, SCREEN_HEIGHT,
+   gWindow = SDL_CreateWindow("Engine Test",
+                              SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, DEFAULT_SCREEN_SIZE.x, DEFAULT_SCREEN_SIZE.y,
                               SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
    if (gWindow == NULL){
       printf( "Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -159,7 +145,7 @@ bool init(BaseEngine& engine){
    }
 
 	//Initialize Shaders and Engine
-   if(!engine.init(vertexShaderSrc, fragShaderSrc)){
+   if(!engine.init(vertexShaderSrc, fragShaderSrc, DEFAULT_SCREEN_SIZE)){
       printf( "Unable to initialize OpenGL!\n" );
       return false;
    }
@@ -189,5 +175,7 @@ bool init(BaseEngine& engine){
 void close(){
 	SDL_DestroyWindow(gWindow);
 	gWindow = NULL;
+	IMG_Quit();
+	TTF_Quit();
 	SDL_Quit();
 }

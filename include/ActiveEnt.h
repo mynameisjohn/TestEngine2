@@ -8,6 +8,11 @@
 
 #include <Entity.h>
 
+typedef struct Status{
+	float health;
+	vec3 speed;
+} Status;
+
 class ActiveEnt: public Entity{
 	public:
 		ActiveEnt();
@@ -19,7 +24,9 @@ class ActiveEnt: public Entity{
 		void moveToEdge(int, Entity *);
 		virtual void move();//Make this pure asap
 		vec3 getVel();
+		float getHealth();
 		char isGrounded();
+		Status getStatus();
 	protected:
 		vec3 mVel; //Active velocity
 		vec3 mSpeed; //Individual speed

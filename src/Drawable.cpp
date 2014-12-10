@@ -6,6 +6,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 
+unordered_map<string, uint32_t> Drawable::TextureSettings = 
+	unordered_map<string, uint32_t> ();
 
 Drawable::Drawable(JShader * shader, int mode, vec4 origin)
 :mShader(shader), mMode(mode){

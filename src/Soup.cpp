@@ -79,9 +79,13 @@ unique_ptr<Population> Soup::createPopulation(string levelFile, Hud& hud, JShade
 
 						(*dMapPtr)["quad"]->addTex(stencilTexture, fromImage(IMG_DIR+stencilTexture));
 
-						if (type == "chunks")
+						if (type == "chunks"){
+							int N(3);
+							fillIn(N, i->Attribute("amount"));
 							hud.addIndicator(move(unique_ptr<Indicator>(
-								new Ind_Chunks(indDim,indColor,stencilTexture,(*dMapPtr)["quad"].get(), p, 3,1,1))));
+								new Ind_Chunks(indDim,indColor,stencilTexture,
+									(*dMapPtr)["quad"].get(), p, N,1,1))));
+						}
 						if (type == "bar")
 							hud.addIndicator(move(unique_ptr<Indicator>(
 								new Ind_Bar(indDim,indColor,stencilTexture,(*dMapPtr)["quad"].get(), p))));
@@ -224,9 +228,9 @@ Entity loadEntity(TiXmlElement * el, unordered_map<string, unique_ptr<Drawable> 
 	s.scale(skelScale);
 	s.setColor(color);
 
+	//MAKE THIS WORK AGAIN!
 	if (el->Attribute("dbg"))
 		fillIn(collider_dbg, el->Attribute("dbg"));
-// >> collider_dbg;
 	
 	//Create some cubes and quads to illustrate the Collider's boundaries
 	if (collider_dbg){
@@ -242,6 +246,7 @@ Entity loadEntity(TiXmlElement * el, unordered_map<string, unique_ptr<Drawable> 
 		//Get Sub Rect scales, create Ligaments
 		vector<BoundRect> subs(col.getSubs());
 		for (uint32_t i=0;i<subs.size();i++){
+
 			Ligament L_sub((*dMapPtr)["quad"].get());
 			vec2 dim(subs[i].getDim()/skelScale);
 			vec2 pos((subs[i].getPos()-vec2(col.getPos()))/skelScale);

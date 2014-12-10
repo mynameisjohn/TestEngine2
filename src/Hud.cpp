@@ -10,7 +10,7 @@ TO DO:
 
 mat4 getPlacementMat(placement p, vec2 scale){
 	vec3 translate;
-	scale = glm::abs(scale);
+//	scale = glm::abs(scale); //commented out for now...
 	switch(p){
 		case TOP_LEFT:
 			translate = vec3(vec2(-1+scale.x,1)-scale, -.9);
@@ -53,28 +53,44 @@ Ind_Chunks::Ind_Chunks(vec2 dim, vec4 color, string sT, Drawable * drPtr, placem
 void Ind_Chunks::draw(mat4 pInv){
 	vec2 scale(dim.x/(float)N,dim.y);
 	mat4 MV;
-	vec4 c(0,0,0,1);
-	for (int i=0;i<N;i++){
-		c.x += 1-(float)i/(float)N;
-		c.y += (float)i/(float)N;
-		c.z += (float)(pow((float)i/(float)N,2));
-		if (p==TOP_RIGHT || p==BOT_RIGHT)
-			MV =  pInv*
-					glm::translate(vec3(-dim.x*(float)(N-1)/(float)N+(float)i*dim.x/(float)N,0,0.05))*getPlacementMat(p, scale);
-		else
-			MV = pInv*glm::translate(vec3((float)i*dim.x/(float)N,0,0.05))*getPlacementMat(p, scale);
-	
-		stencil->uploadColor(c);
-		stencil->uploadMV(MV);
-		stencil->draw();
-		MV = glm::translate(vec3(0,0,0.05))*MV;
-		stencil->uploadMV(MV);
-		stencil->draw(stencilTexture);
+	vec4 c(1,.1,.1,1);
+	stencil->uploadColor(c);
+
+	//The idea is to get the health (as a percentage)
+	//and draw quads up until that value
+	int maxIdx((int)(value*(float)N));
+	float yScale(dim.y*(value*((float)N) - (float)(maxIdx)));
+
+	int i(0);
+	for (; i<N; i++){
+		//just draw quads
+		float xTrans( (p==TOP_RIGHT || p==BOT_RIGHT) ? 
+				-dim.x*(float)(N-1)/(float)N+(float)i*dim.x/(float)N :
+				(float)i*dim.x/(float)N);
+		//Everything is full up until maxIdx
+		if (i < maxIdx){
+			MV = pInv*glm::translate(vec3(xTrans,0,0.05))*
+															getPlacementMat(p, scale);
+			stencil->uploadMV(MV);
+			stencil->draw();
+		}
+		//If we are on the last chunk
+		else if (i == maxIdx){ //This grows down right now...
+			MV = pInv*glm::translate(vec3(xTrans,-yScale,0.05))*
+						getPlacementMat(p, vec2(scale.x,-yScale));
+			stencil->uploadMV(MV);
+			stencil->draw();
+		}
+		//Always draw the stencil
+		MV = pInv*glm::translate(vec3(xTrans,0,0))*getPlacementMat(p,scale);
+      stencil->uploadMV(MV);
+      stencil->draw(stencilTexture);
 	}
 }
 
 void Ind_Chunks::update(Player * playerPtr){
-//NYI
+	setValue(max(playerPtr->getHealth()/150.f, 0));
+	//cout << value/2 << endl;
 }
 
 Ind_Bar::Ind_Bar()
@@ -82,10 +98,10 @@ Ind_Bar::Ind_Bar()
 }
 
 Ind_Bar::Ind_Bar(vec2 dim, vec4 color, string sT, Drawable * stPtr, placement p)
-: Indicator(dim, color, sT, stPtr, p), value(0.5){
+: Indicator(dim, color, sT, stPtr, p){
 }
 
-void Ind_Bar::setValue(float value){
+void Indicator::setValue(float value){
 	this->value = value;
 }
 
@@ -94,23 +110,19 @@ void Ind_Bar::update(Player * playerPtr){
 }
 
 void Ind_Bar::draw(mat4 pInv){
-//	static float osc(0);
-//	osc += 0.1f;
-//	value = 0.5f*sin(osc)+0.5f;
 	vec2 scale(dim.x, dim.y);
 	mat4 MV = pInv*glm::translate(vec3(-(1-value)*dim.x,0,.05))*getPlacementMat(p,vec2(scale.x*value,scale.y));
 	stencil->uploadMV(MV);
 	stencil->uploadColor(color);
 	stencil->draw();
+	MV = pInv*glm::translate(vec3(0,0,0))*getPlacementMat(p,scale);;
+	stencil->uploadMV(MV);
+	stencil->draw(stencilTexture);
 }
 
 Hud::Hud()
 : slots(0){
 }
-
-void Hud::push_back(Drawable * drPtr){
-}
-
 
 void Hud::addIndicator(unique_ptr<Indicator> indPtr){
 	if (slots & (1 << indPtr->getPlacement()))

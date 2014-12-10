@@ -21,6 +21,7 @@ class Drawable{
 		bool addTex(vector<pair<string, uint32_t> > texVec);
 		void uploadMV(mat4& MV);
 		void uploadColor(vec4& c);
+		bool changeTextureSettings(string setting, uint32_t value);
 		int getNumElems();
 		uint32_t getVAO();
 		uint32_t getTex();
@@ -34,6 +35,8 @@ class Drawable{
 		unordered_map<string, uint32_t> texMap;
 		int mElementCount;
 		vector<vec4> origins;
+	private:
+		static unordered_map<string, uint32_t> TextureSettings;
 };
 
 #endif

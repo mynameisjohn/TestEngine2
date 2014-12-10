@@ -11,15 +11,16 @@ TODO
 
 #include <Level.h>
 #include <BaseEngine.h>
+#include <Textures.h>
 
 #include <string>
+#include <set>
 
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 
 #include <GL_Includes.h>
 
-#include <set>
 
 BaseEngine::BaseEngine(){
 	//NYI
@@ -30,19 +31,23 @@ BaseEngine::~BaseEngine(){
 	glBindVertexArray(0);
 }
 
-bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
+bool BaseEngine::init(string vS, string fS, vec2 screenDim){
 	//Load Vertex/Fragment Shader files
-   if (!shader.loadVert(vertShaderSrc) ||
-       !shader.loadFrag(fragShaderSrc))
+   if (!shader.loadVert(vS) ||
+       !shader.loadFrag(fS))
       return false;
 
    //Generate Shader Program
    if (!shader.loadProgram())
       return false;
 
+	cam = Camera(screenDim);
+
 	level = unique_ptr<Level>(new Level(1, hud, shader, &dMap));
 
-	hud.push_back(dMap["stencil"].get());
+	//just testing fonts
+	dMap["quad"]->addTex("fontTest", fromTextString("hello"));
+
 
 	return true;
 }
@@ -119,7 +124,7 @@ void BaseEngine::handleMotion(float x, float y){
 	mat4 projMat = cam.getProjMat();
 
 	//map mouse position to screen coordinates
-	vec2 sp = remap(vec2(x,y)/SCREEN_DIM, m1, m2, m3, m4);//fix this
+	vec2 sp = remap(vec2(x,y)/cam.getScreenDim(), m1, m2, m3, m4);//fix this
 
 	//get player position in screen coordinates
 	vec4 playerPos = projMat * vec4(level->getPlayer()->center(), 1);
@@ -156,4 +161,8 @@ void BaseEngine::unBindShader(){
 
 void BaseEngine::updateProjMat(){
 	cam.updateProj(shader.getProjHandle());
+}
+
+vec2 BaseEngine::getScreenDim(){
+	return cam.getScreenDim();
 }

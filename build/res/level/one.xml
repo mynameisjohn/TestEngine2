@@ -27,7 +27,7 @@
 	/>
 -->
 <Level>
-	<Player name="girl" dbg="0"
+	<Player name="girl" dbg="1"
 		health="150"
 		resource="girl.xml"
 		T="800,500,-2700"
@@ -37,20 +37,21 @@
 		<Hud>
 			<Indicator
 				type="chunks"
-				stencil="stencil.png"
+				stencil="healthStencil.png"
 				dim="0.4,0.25"
 				color="1,0,0,1"
 				placement="TOP_LEFT"
+				amount="3"
 			/>
 			<Indicator 
 				type="bar"
-				stencil="stencil.png"
+				stencil="chargeStencil.png"
 				dim="0.4,0.25"
 				color="0,0.5,1,1"
 				placement="TOP_RIGHT"
 			/>
 		</Hud>
-		<Projectile dbg="0"
+		<Projectile dbg="1"
 			resource="arrow.png"
 			T="0,0,0"
 			R="0,0,0,1"

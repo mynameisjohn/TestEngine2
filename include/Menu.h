@@ -11,7 +11,8 @@ enum ButtonState{
 	BUT_MouseOver = 1,
 	BUT_RightClicked = 2,
 	BUT_LeftClicked = 4,
-	BUT_MiddleClicked = 8
+	BUT_MiddleClicked = 8,
+	BUT_Toggled = 16
 };
 
 class Button{
@@ -41,13 +42,13 @@ class Menu{
 	vector<Button> buttons;
 public:
 	Menu();
-	Menu(Drawable * base, uint32_t w, uint32_t h, uint32_t dS = 1);
+	Menu(Drawable * base, vec2 screenDim, uint32_t dS = 1);
 	void push_back(Button b);
 	void emplace_back(vec2 pos, vec2 dim);
 	void clearButtons();
 	bool isFBOComplete();
-	bool grabScreen(uint32_t w, uint32_t h);
-	MenuState handleEvent(SDL_Event& e);
+	bool grabScreen(vec2 screenDim);
+	MenuState handleEvent(SDL_Event& e, vec2 screenDim);
 	uint32_t update();
 	uint32_t render(mat4 pInv);
 };

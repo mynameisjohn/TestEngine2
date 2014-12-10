@@ -6,11 +6,17 @@
 #include <glm/gtc/type_ptr.hpp>
 
 Camera::Camera(){
-	buf=200.f; 
-	mBB = BoundBox(vec3(-1000,-1000,0),vec3(2000,2000,0));
-	projMat=glm::perspective((float)M_PI/4.f, SCREEN_DIM.x/SCREEN_DIM.y, 100.f, 10000.f) *
+	screenDim = vec2(300);
+	projMat = mat4();
+}
+
+Camera::Camera(vec2 sD){
+	screenDim = sD;
+	
+	projMat=glm::perspective((float)M_PI/4.f, screenDim.x/screenDim.y, 
+		100.f, 10000.f) *
 		glm::rotate((float)M_PI/15.f, vec3(1, 0, 0)) * 
-		glm::translate(vec3(0, -(SCREEN_DIM.x*0.667F),0));
+		glm::translate(vec3(0, -(screenDim.x*0.667F),0));
 }
 
 Camera::Camera(float b, mat4 p){
@@ -87,4 +93,8 @@ mat4 Camera::getProjMat(){
 
 void Camera::updateProj(GLint projHandle){
 	glUniformMatrix4fv(projHandle, 1, GL_FALSE, glm::value_ptr(projMat));
+}
+
+vec2 Camera::getScreenDim(){
+	return screenDim;
 }
