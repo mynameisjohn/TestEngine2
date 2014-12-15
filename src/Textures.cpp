@@ -85,6 +85,7 @@ uint32_t outlineTexture(bool invert){
 	return initTexture(PXA.data(), DIM, DIM);
 }
 
+//Figure out how to make it so text size is uniform
 uint32_t fromTextString(string text, uint32_t fontSize, vec3 textColor, vec3 bgColor, vec2 border){
 	uint32_t tex(0);
 	uint32_t backgroundColor(getRGBAInt(bgColor)), foregroundColor(getRGBAInt(textColor));

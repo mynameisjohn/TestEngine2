@@ -108,7 +108,7 @@ const vec3 BG_LAYER, BASE_LAYER(0,0,-.05), PANE_LAYER(0,0,-0.1), CONTROL_LAYER(0
 void Menu::draw(){
    //Scale, translation, active/inactive colors, model view matrix
    vec3 S, T;
-   vec4 white(1), activeColor(vec3(0.1),0.87), inactiveColor(vec3(0.5),0.87), baseColor(vec3(0.1),0.87);
+   vec4 white(1), activeColor(vec3(0.1),0.95), inactiveColor(vec3(0.5),0.95), baseColor(vec3(0.1),0.95);
    mat4 MV;
 
 	//Draw screen as background
@@ -150,6 +150,7 @@ bool Menu::addPane(string l){
 		return false;
 
 	m_Panes.emplace(l, l);
+	qPtr->addTex(l, fromTextString(l));
 
 	if (m_Panes.find(m_ActivePane) == m_Panes.end())
 		m_ActivePane = l;

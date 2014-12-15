@@ -71,7 +71,8 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 	level = unique_ptr<Level>(new Level(1, hud, shader, &dMap));
 
 	//Create the menu frame
-	menu = Menu(BoundRect(vec2(-0.75f), vec2(1.5)),0.15f, dMap["quad"].get()); 
+	vec2 menuDim(1.5);
+	menu = Menu(BoundRect(-0.5f*menuDim, menuDim),0.15f, dMap["quad"].get()); 
 
 	float aspect = DEFAULT_SCREEN_DIM.x / DEFAULT_SCREEN_DIM.y;
 	mat4 proj = 
@@ -98,18 +99,11 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 		return false;
 
 	//Add some panes to the menu (will be in XML soon enough
-	if (!menu.addPane("General"))
+	if ((menu.addPane("General") &&
+		  menu.addPane("Video") &&
+		  menu.addPane("Audio") &&
+		  menu.addPane("Controls")) == false)
 		return false;
-
-	//This should all happen when the pane is added	
-	dMap["quad"]->addTex("General", fromTextString("yo"));
-
-	if (!menu.addPane("Tits"))
-		return false;
-
-	//This should all happen when the pane is added	
-	dMap["quad"]->addTex("Tits", fromTextString("ass"));
-
 	
 
 	m_Status = RESUME_GAME;
