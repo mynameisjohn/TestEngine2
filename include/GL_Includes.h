@@ -16,4 +16,8 @@
 	#include <GL/glu.h>
 #endif
 
+inline bool isFBOComplete(){
+   return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+}
+
 #endif

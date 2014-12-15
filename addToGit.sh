@@ -10,6 +10,7 @@ git add  tinyxml/CMakeLists.txt \
 			build/res/sprt/*.sprt \
 			build/res/svg/*.svg \
 			build/res/obj/*.obj \
+			build/res/fonts/*.ttf \
 			CMakeLists.txt \
 			*.sh \
 			README.md \

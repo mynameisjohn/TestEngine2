@@ -18,17 +18,44 @@ TODO
 #include <glm/gtx/transform.hpp>
 
 #include <GL_Includes.h>
-
+#include <Textures.h>
 #include <set>
 
-BaseEngine::BaseEngine(){
-	//NYI
-}
+//Menu downsample
+const int DS(4);
+
+BaseEngine::BaseEngine()
+//	:	m_Status(QUIT_GAME)
+{}
 
 BaseEngine::~BaseEngine(){
 	glDeleteProgram(shader.getProgramID());
 	glBindVertexArray(0);
 }
+
+GameState BaseEngine::iterate(){
+	mat4 I(1);
+	shader.bind();
+	switch(m_Status){
+		case RESUME_GAME:
+			move();
+			update();
+			draw();
+			break;
+		case RESUME_MENU:
+			glUniformMatrix4fv(shader.getProjHandle(), 1, GL_FALSE, glm::value_ptr(I));
+			menu.update();
+			menu.draw();
+			break;
+		case QUIT_GAME:
+		default:
+			m_Status = QUIT_GAME;
+	}
+	shader.unbind();
+
+	return m_Status;
+}
+
 
 bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 	//Load Vertex/Fragment Shader files
@@ -40,63 +67,111 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
    if (!shader.loadProgram())
       return false;
 
+	//Load first level
 	level = unique_ptr<Level>(new Level(1, hud, shader, &dMap));
 
-	hud.push_back(dMap["stencil"].get());
+	//Create the menu frame
+	menu = Menu(BoundRect(vec2(-0.5f), vec2(1)),0.15f, dMap["quad"].get()); 
 
-	return true;
+	float aspect = DEFAULT_SCREEN_DIM.x / DEFAULT_SCREEN_DIM.y;
+	mat4 proj = 
+		glm::perspective((float)M_PI/4.f, aspect, 100.f, 10000.f) *
+		glm::rotate((float)M_PI/15.f, vec3(1, 0, 0));
+	
+// * 		glm::translate(vec3(0, DEFAULT_SCREEN_DIM.x*1.667F,0));
+	cam = Camera(DEFAULT_SCREEN_DIM, proj, vec3());//level->getPlayer()->getPos());
+
+	vec2 screenDim(cam.getScreenDim());
+	//Generate blank texture, add it to drawable
+   *(menu.getTex()) = initTexture(NULL, screenDim.x/DS, screenDim.y/DS);
+   dMap["quad"].get()->addTex("screen", *(menu.getTex()));
+
+   //Generate Frame buffer and attach texture
+   glGenFramebuffers(1, menu.getFBO());
+   glBindFramebuffer(GL_FRAMEBUFFER, *(menu.getFBO()));
+   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *(menu.getTex()), 0);   
+
+   //Rebind back buffer
+   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	m_Status = RESUME_GAME;
+
+	return isFBOComplete();
+}
+
+bool BaseEngine::grabScreen(){
+	uint32_t FBO(*(menu.getFBO()));
+   //Bind Read and Draw buffers for Blit
+   glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, *(menu.getFBO()));
+   //Blit with downsampling for fun
+	vec2 screenDim(cam.getScreenDim());
+   glBlitFramebuffer(0, 0, screenDim.x, screenDim.y,
+                     0, screenDim.y/DS, screenDim.x/DS, 0
+                     ,GL_COLOR_BUFFER_BIT, GL_NEAREST);
+   //Return back buffer into the default slot
+   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+   return isFBOComplete();
+}
+
+vec2 BaseEngine::getScreenDim(){
+	return cam.getScreenDim();
 }
 
 void BaseEngine::update(){
-//	pop->update();
 	level->update();
 	if (!motionHandled){
 		int x,y;
 		SDL_GetMouseState(&x,&y);
 		handleMotion((float)x, (float)y);
 	}
-	//cout << level->getPlayer()->getCharge() << endl;
 	hud.update(level->getPlayer());
 }
 
 //figure out a better way to do this
 void BaseEngine::move(){
-//	level.move();
-	cam.push(level->move());//getPlayer());
+	cam.push(level->move());
 }
-//Try and get SDL out of the picture
-void BaseEngine::handleEvent(SDL_Event& e){
+
+GameState BaseEngine::handleEvent(SDL_Event * e){
 	EventRegister * eReg = level->getPlayer()->getRegPtr();
 
-	switch (e.type){
+	switch (e->type){
 		case SDL_KEYUP:
+			if (e->key.keysym.sym == SDLK_ESCAPE && m_Status != RESUME_MENU){
+				grabScreen();
+				m_Status = RESUME_MENU;
+				break;
+			}
+			if (m_Status == RESUME_MENU){
+				MenuState ms = menu.handleEvent(e);
+				m_Status = ms.gs;
+			}
 		case SDL_KEYDOWN:
-			if (!e.key.repeat)
-				eReg->handleKey(keyCode(e), e.type==SDL_KEYDOWN);
+			if (e->key.repeat == false)
+				eReg->handleKey((int)(e->key.keysym.sym), e->type==SDL_KEYDOWN);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
-			switch (e.button.button){
-				case SDL_BUTTON_LEFT:
-					eReg->toggleLMB();
-					break;
-				case SDL_BUTTON_RIGHT:
-					eReg->toggleRMB();
-					break;
-			}
+			if (e->button.button == SDL_BUTTON_LEFT)
+				eReg->toggleLMB();
+			if (e->button.button == SDL_BUTTON_RIGHT)
+				eReg->toggleRMB();
 			break;
 		case SDL_MOUSEMOTION:{
-			float x(e.motion.x), y(e.motion.y);
+			float x(e->motion.x), y(e->motion.y);
 			handleMotion(x,y);
 		}
 		default:
 			break;
 	}
+	return m_Status;
 }
 
-void BaseEngine::render(){
+void BaseEngine::draw(){
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   bindShader();
+//   bindShader();
 
 	//send projection matrix to device
 	cam.updateProj(shader.getProjHandle());
@@ -105,7 +180,7 @@ void BaseEngine::render(){
 
 	hud.draw(glm::inverse(cam.getProjMat()));
 
-	unBindShader();
+//	unBindShader();
 	motionHandled = false;
 }
 
@@ -119,7 +194,7 @@ void BaseEngine::handleMotion(float x, float y){
 	mat4 projMat = cam.getProjMat();
 
 	//map mouse position to screen coordinates
-	vec2 sp = remap(vec2(x,y)/SCREEN_DIM, m1, m2, m3, m4);//fix this
+	vec2 sp = remap(vec2(x,y)/getScreenDim(), m1, m2, m3, m4);//fix this
 
 	//get player position in screen coordinates
 	vec4 playerPos = projMat * vec4(level->getPlayer()->center(), 1);

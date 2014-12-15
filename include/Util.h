@@ -29,6 +29,7 @@ const string RIG_DIR("res/rig/");
 const string SVG_DIR("res/svg/");
 const string SPR_DIR("res/sprt/");
 const string ENT_DIR("res/entities/");
+const string FONT_DIR("res/fonts/");
 
 int wrap(int dim, int num);
 float min(float v1, float v2);
@@ -45,6 +46,9 @@ float min(vec3 v);
 float max(vec3 v);
 float min(vec4 v);
 float max(vec4 v);
+
+uint32_t getRGBAInt(vec4 c);
+uint32_t getRGBAInt(vec3 c);
 
 void printError(string name);
 

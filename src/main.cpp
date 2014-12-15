@@ -26,56 +26,100 @@ const int glMajor(3), glMinor(0);
 #endif
 
 int main(int argc, char ** argv){
+
+	GameState currentState;
 	BaseEngine engine;
-	//Initialize Everything
+	SDL_Event * evt(nullptr);
+
 	if (!init(engine)){
-	   printf( "Failed to initialize!\n" );
-      return EXIT_FAILURE;
-   }
+		close();
+		return EXIT_FAILURE;
+	}
 
-	//different loop states
-	enum state{
-		STATE_QUIT,
-		STATE_GAME,
-		STATE_MENU
-	};
+	evt = new SDL_Event();
+	HandleEvent:
+	while (SDL_PollEvent(evt)){
+		if (evt->type == SDL_QUIT)
+			goto Quit;
+		GameState evtState = engine.handleEvent(evt);
+		if (evtState == QUIT_GAME)
+			goto Quit;
+	}
 
-	//Game state, main event struct, Menu object
-	state s(STATE_GAME);
-	SDL_Event e;
-	Menu menu(engine.getDrawablePtr("quad"),SCREEN_DIM.x, SCREEN_DIM.y, 4);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	currentState = engine.iterate();
+	SDL_GL_SwapWindow(gWindow);
 
-	//While the state hasn't been set to quit
-	while (s != STATE_QUIT){
-		//Check for events
-		while (SDL_PollEvent(&e)){
-			if (e.type == SDL_QUIT)
-				s = STATE_QUIT;
-			else{ //If Escape is pressed for the first time, and we aren't in Menu
-				if (e.key.keysym.sym == SDLK_ESCAPE && e.type == SDL_KEYDOWN && 
-					 e.key.repeat == 0 && s != STATE_MENU){
-					//Set state to Menu, grab currect screen for background
-					s = STATE_MENU;
-					menu.grabScreen(SCREEN_DIM.x, SCREEN_DIM.y);
-				}//Otherwise, if we're in menu
-				else if (s == STATE_MENU){
-					//Depending on what the event is
-					switch(menu.handleEvent(e)){
-						case MENU_CONTINUE: //Stay in Menu
-							break;
-						case MENU_RESUME: //Resume game
-							s = STATE_GAME;
-							break;
-						case MENU_QUIT: //Quit
-						default:
-							s = STATE_QUIT;
-							break;
-					}
-				}
-				//Engine just stays aware of the keyboard (MOVE OUT EVENT_REGISTER)
-				engine.handleEvent(e);//I don't like this because motion is expensive
-			}
+	if (currentState != QUIT_GAME)
+		goto HandleEvent;
+
+
+	Quit:
+	if (evt) delete evt;
+   close();
+	cout << "goodbye" << endl;
+   return EXIT_SUCCESS;
+	/*
+
+	const int GAME_RESUME(1), GAME_QUIT(2);
+
+	SDL_Event * evt(new SDL_Event());//malloc(sizeof(SDL_Event))
+	//GameState GS(GAME_RESUME);
+	int GS(GAME_RESUME);
+
+	while (GS != GAME_QUIT){
+		//Clear OpenGL Buffers
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//If there's an event, handle it
+		if (SDL_PollEvent(evt)){
+			if (evt->type == SDL_QUIT)
+				break;
+//			engine.handleEvent(evt);
 		}
+		//Iterate Engine
+		GS = engine.iterate();
+		//Swap window Buffers
+		SDL_GL_SwapWindow(gWindow);
+	}		
+
+	
+	if (evt)
+		delete evt;	
+	close();
+
+	return EXIT_SUCCESS;
+*/
+/*
+			
+		}
+
+		close();
+
+		return EXIT_SUCCESS;
+
+
+
+		bool inPlay(GAME_RESUME);
+
+
+
+
+
+		handleevent:
+		while (inPlay != GAME_QUIT)
+			while (SDL_PollEvent(&e){
+				if (e.type == SDL_QUIT)
+					goto iterate;
+			}
+			inplay = engine.iterate(e);
+			if (inPlay == GAME_QUIT)
+				goto draw;
+			while 
+			if (engine.iterate() == GAME_QUIT)
+				break;
+		}
+
+		
 
 		//Clear OpenGL Buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -105,7 +149,7 @@ int main(int argc, char ** argv){
 	//After loop, close up shop
 	close();
 
-	return EXIT_SUCCESS;
+	return EXIT_SUCCESS;*/
 }
 
 bool init(BaseEngine& engine){
@@ -128,10 +172,12 @@ bool init(BaseEngine& engine){
    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
+	//Make local
    //Create Window
+	vec2 screenDim(engine.getScreenDim());
    gWindow = SDL_CreateWindow("3D Test",
                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                              SCREEN_DIM.x, SCREEN_DIM.y, //SCREEN_WIDTH, SCREEN_HEIGHT,
+                              screenDim.x, screenDim.y,
                               SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
    if (gWindow == NULL){
       printf( "Window could not be created! SDL Error: %s\n", SDL_GetError());

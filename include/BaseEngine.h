@@ -1,8 +1,9 @@
-#include <Drawable.h>
+//#include <Drawable.h>
 #include <Camera.h>
-#include <JShader.h>
-#include <Population.h>
+//#include <JShader.h>
+//#include <Population.h>
 #include <Level.h>
+#include <Menu.h>
 
 #include <memory>
 #include <SDL.h>
@@ -16,18 +17,23 @@ public:
 	bool init(std::string vs, std::string fs);
 	void update();
 	void move();
-	void render();
-	void handleEvent(SDL_Event& e);
+	void draw();
 	void bindShader();
 	void unBindShader();
 	void updateProjMat();
 	void clearKeyState();
+	bool grabScreen();
+	vec2 getScreenDim();
+	GameState handleEvent(SDL_Event * e);
+	GameState iterate();
 	Drawable * getDrawablePtr(string name);
 	mat4 getProjMat();
 private:
+	GameState m_Status;
 	Camera cam;
 	JShader shader;
 	Hud hud;
+	Menu menu;
 	unique_ptr<Level> level;
 	bool motionHandled;
 	void handleMotion(float x, float y);

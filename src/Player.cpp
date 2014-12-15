@@ -80,7 +80,7 @@ void Player::move(){
 	ActiveEnt::move();
 }
 
-void Player::update(){//EventInfo evInfo){
+void Player::update(){
 	if (grounded){
 		mVel.y=0.f;
 		eReg.worldMouse.x += mVel.x;
