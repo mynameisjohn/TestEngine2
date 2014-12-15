@@ -1,4 +1,4 @@
-
+/*
 #include <GL_Includes.h>
 
 #include <SDL_image.h>
@@ -7,12 +7,10 @@
 #include <BaseEngine.h>
 
 #include <glm/gtx/transform.hpp>
-
+*/
+/*
 bool init(BaseEngine& engine);
 void close();
-
-SDL_Window * gWindow;
-SDL_GLContext gContext;
 
 //Apple demands OpenGL 3.3, and needs more modern shaders
 #ifdef __APPLE__
@@ -24,9 +22,18 @@ const std::string vertexShaderSrc = "shaders/vertShader.glsl";
 const std::string fragShaderSrc = "shaders/fragShader.glsl";
 const int glMajor(3), glMinor(0);
 #endif
+*/
+
+#include <main.h>
+#include <GL_Includes.h>
+#include <SDL_image.h>
+
+//Why are these still global?
+SDL_Window * gWindow;
+SDL_GLContext gContext;
 
 int main(int argc, char ** argv){
-
+	//goto loops are the work of the devil
 	GameState currentState;
 	BaseEngine engine;
 	SDL_Event * evt(nullptr);

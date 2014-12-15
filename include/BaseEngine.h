@@ -1,3 +1,6 @@
+#ifndef BASEENGINE_H
+#define BASEENGINE_H
+
 //#include <Drawable.h>
 #include <Camera.h>
 //#include <JShader.h>
@@ -62,3 +65,5 @@ void initPlayer();
 
 void initObstacle(int x, int y);
 */
+
+#endif
