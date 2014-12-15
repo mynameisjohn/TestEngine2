@@ -99,8 +99,7 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 		  menu.addPane("Controls")) == false)
 		return false;
 	
-	float bullshit(0);
-	Slider s("switch",BoundRect(vec2(0.3),vec2(0.3)),dMap["quad"].get(),1,1,1,&bullshit);
+	Slider s("switch",BoundRect(vec2(0.3),vec2(0.3,0.15)),dMap["quad"].get(),0.5,0,1,nullptr);
 	menu["General"]->addControl(s);
 
 	m_Status = RESUME_GAME;

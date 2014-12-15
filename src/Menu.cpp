@@ -10,11 +10,26 @@
 const int MENU_MAX_PANES(5), PANE_MAX_CONTROLS(5);
 const vec3 BG_LAYER, BASE_LAYER(0,0,-.05), PANE_LAYER(0,0,-0.1), CONTROL_LAYER(0,0,-0.15);
 
+void drawRect(BoundRect br, Drawable * drPtr, vec3 offset, vec4 color, string tex){
+	mat4 MV = glm::translate(vec3(br.getPos(),0)+offset)*glm::scale(vec3(br.getDim(),1));
+	drPtr->uploadMV(MV);
+	drPtr->uploadColor(color);
+	drPtr->draw(tex);
+}
+
 Control::Control()
  : drPtr(nullptr) { }
 
 Control::Control(string l, BoundRect r, Drawable * d)
  : label(l), colRect(r), drPtr(d) { }
+
+string Control::getLabel(){
+	return label;
+}
+
+BoundRect Control::getRect(){
+	return colRect;
+}
 
 Slider::Slider()
  : Control(), handle(nullptr) { }
@@ -31,18 +46,56 @@ Switch::Switch(string l, BoundRect r, Drawable * d, vector<string> o, uint32_t s
 void Switch::draw(){
 }
 
+bool Switch::update(){
+	return false;
+}
+
+//I'll be using real textures...eventually
 void Slider::draw(){
-	mat4 MV(glm::translate(vec3(colRect.getPos(),CONTROL_LAYER.z))*glm::scale(vec3(colRect.getDim(),1)));
-	vec4 color(1,0,0,1);
-	drPtr->uploadMV(MV);
-	drPtr->uploadColor(color);
-	drPtr->draw();
+	vec4 aColor(vec3(0.3),1), bColor(vec3(0.5),1), cColor(vec3(0.7),1), dColor(vec3(0.9),1);
+	vec3 off(0,0,-0.05);
+	vec2 c(0.01),b(.02,0.09),h(.04,.12);
+	float lWidth(0.04), bWidth(0.01);
+	BoundRect A(colRect);
+	BoundRect B(A.getPos()+c, {A.getDim().x-2*c.x,lWidth});
+	BoundRect C(A.getPos()+b, {A.getDim().x-2*b.x,bWidth});
+	BoundRect D(C.getPos()+vec2(lerp(0,C.getDim().x,value),0)-A.getDim()*h/2.f,max(A.getDim())*h);
+
+	static float osc(0);
+	value = 0.5f*sin(osc)+0.5f;
+	osc += 0.01f;
+
+	//Draw base rectangle
+	drawRect(A, drPtr, 1.5f*off, aColor);
+	//Draw label
+	drawRect(B, drPtr, 1.755f*off, bColor);
+
+	//Draw Slider line
+	drawRect(C, drPtr, 2.f*off, cColor);
+
+	//Draw Slider handle
+	drawRect(D, drPtr, 2.25f*off, dColor);
+}
+
+bool Slider::update(){
+	if (handle)
+		*handle = lerp(minValue, maxValue, clamp(value,0,1));
+	return false;
 }
 
 //Main constructor
 Pane::Pane(string l)
    :  m_Label(l) 
 {}
+
+bool Pane::update(){
+	bool ret(false);
+   vector<unique_ptr<Control> >::iterator cIt;
+   for (cIt=m_Controls.begin(); cIt!=m_Controls.end(); cIt++)
+      if ((*cIt)->update())
+			ret = true;
+	return ret;
+}
 
 //Draw all of the pane's controls
 void Pane::draw(){
@@ -145,6 +198,15 @@ void Menu::draw(){
 	it = m_Panes.find(m_ActivePane);
 	if (it != m_Panes.end())
 		it->second.draw();
+}
+
+bool Menu::update(){
+	bool ret(false);
+	unordered_map<string, Pane>::iterator it;
+	for (it = m_Panes.begin(); it!=m_Panes.end(); it++)
+		if (it->second.update())
+			ret = true;
+	return ret;
 }
 
 //Add a pane with string label l (if possible)

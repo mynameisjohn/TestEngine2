@@ -13,6 +13,8 @@
 #include <BoundRect.h>
 #include <memory>
 
+void drawRect(BoundRect br, Drawable * drPtr, vec3 offset=vec3(), vec4 color=vec4(1), string tex="");
+
 enum GameState{
 	RESUME_MENU=1,
 	RESUME_GAME=2,
@@ -30,6 +32,9 @@ public:
    Control(string, BoundRect, Drawable *);
    virtual void draw() = 0;
    virtual bool handleEvent(SDL_Event * e) = 0;
+	virtual bool update() = 0;
+	string getLabel();
+	BoundRect getRect();
 protected:
    string label;
    BoundRect colRect;
@@ -43,6 +48,7 @@ public:
    Slider(string l, BoundRect rect, Drawable * drPtr, float v, float m, float M, float * h);
    void draw();
    bool handleEvent(SDL_Event * e);
+	bool update();
 private:
    float value, minValue, maxValue, * handle;
 };
@@ -54,6 +60,7 @@ public:
    Switch(string l, BoundRect rect, Drawable * d, vector<string> o, uint32_t s, uint32_t * h);
    void draw();
    bool handleEvent(SDL_Event * e);
+	bool update();
 private:
    vector<string> options;
    uint32_t state, * handle;
@@ -66,6 +73,7 @@ public:
 	void draw();
 	bool addControl(Control& c);
 	bool handleEvent(SDL_Event * e);
+	bool update();
 	string getLabel();
 private:
 	string m_Label;
@@ -78,7 +86,7 @@ public:
 	Menu(BoundRect r = BoundRect(vec2(-0.5f), vec2(1)), float pH = 0.15f, Drawable * d = nullptr);
 	void draw();
 	bool addPane(string l);
-	bool update(){return true;}
+	bool update();
 	uint32_t * getFBO(){ return &m_FBO; }
 	uint32_t * getTex(){ return &m_Tex; }
 	
