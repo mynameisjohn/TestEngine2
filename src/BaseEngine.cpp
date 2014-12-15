@@ -1,25 +1,19 @@
 /**
 
 TODO
+	-- Have hud drawn to a separate buffer, just so menu bg doesn't have it
 	-- comment code properly
-	-- create library/character libraries
-	-- projectiles
 	-- art
 	-- sound
-	-- skinning
 **/
 
-#include <Level.h>
 #include <BaseEngine.h>
-
-#include <string>
 
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 
 #include <GL_Includes.h>
 #include <Textures.h>
-#include <set>
 
 //Menu downsample
 const int DS(4);
@@ -105,6 +99,9 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 		  menu.addPane("Controls")) == false)
 		return false;
 	
+	float bullshit(0);
+	Slider s("switch",BoundRect(vec2(0.3),vec2(0.3)),dMap["quad"].get(),1,1,1,&bullshit);
+	menu["General"]->addControl(s);
 
 	m_Status = RESUME_GAME;
 
@@ -112,7 +109,6 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 }
 
 bool BaseEngine::grabScreen(){
-	uint32_t FBO(*(menu.getFBO()));
    //Bind Read and Draw buffers for Blit
    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, *(menu.getFBO()));

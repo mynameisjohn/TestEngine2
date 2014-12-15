@@ -1,3 +1,9 @@
+/*
+	BUG : Not really, but since the panes are in an unordered map I don't really
+	have a say in what order they're in (and what order they get drawn in.)
+	Resolve it. 
+*/
+
 #ifndef MENU_H
 #define MENU_H
 

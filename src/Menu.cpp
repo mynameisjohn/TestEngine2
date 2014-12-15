@@ -8,6 +8,7 @@
 
 //Max number of Panes per menu / Controls per Pane
 const int MENU_MAX_PANES(5), PANE_MAX_CONTROLS(5);
+const vec3 BG_LAYER, BASE_LAYER(0,0,-.05), PANE_LAYER(0,0,-0.1), CONTROL_LAYER(0,0,-0.15);
 
 Control::Control()
  : drPtr(nullptr) { }
@@ -28,11 +29,14 @@ Switch::Switch(string l, BoundRect r, Drawable * d, vector<string> o, uint32_t s
  : Control(l, r, d), options(o), state(s), handle(h) { }
 
 void Switch::draw(){
-
 }
 
 void Slider::draw(){
-
+	mat4 MV(glm::translate(vec3(colRect.getPos(),CONTROL_LAYER.z))*glm::scale(vec3(colRect.getDim(),1)));
+	vec4 color(1,0,0,1);
+	drPtr->uploadMV(MV);
+	drPtr->uploadColor(color);
+	drPtr->draw();
 }
 
 //Main constructor
@@ -102,7 +106,6 @@ Menu::Menu(BoundRect r, float pH, Drawable * d)
 			m_ActivePane("")
 {}
 
-const vec3 BG_LAYER, BASE_LAYER(0,0,-.05), PANE_LAYER(0,0,-0.1), CONTROL_LAYER(0,0,-0.15);
 
 //Draw the menu and its components
 void Menu::draw(){
@@ -118,8 +121,8 @@ void Menu::draw(){
 	qPtr->draw("screen");
 
    //Draw base quad
-   S = vec3(m_Rect.getDim(),1);// - vec2(0, -m_PaneHeight), 1);
-   T = vec3(m_Rect.getPos(),0);// - vec2(0, -m_PaneHeight), 1);
+   S = vec3(m_Rect.getDim(),1);
+   T = vec3(m_Rect.getPos(),0);
    MV = glm::translate(T + BASE_LAYER)*glm::scale(S);
    qPtr->uploadMV(MV);
    qPtr->uploadColor(baseColor);
@@ -176,12 +179,16 @@ MenuState Menu::handleEvent(SDL_Event * e){
       ret.gs = QUIT_GAME;
    else if (e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_ESCAPE)
       ret.gs = RESUME_GAME;
-   else
+   else{
+		switch (e->type){
+			case SDL_MOUSEBUTTONDOWN:
+				//Here we'd have to check if the player has clicked a new active pane
+				//won't work with the unordered_map setup
+			default: break;
+		}	
 		if (m_Panes.find(m_ActivePane) != m_Panes.end())
-	      ret.update = m_Panes[m_ActivePane].handleEvent(e);
-	else cout << "no active pane" << endl;
-   // 1. Make the control state a Menu member; clear it after each loop
-   // 2. Set the active pane based on mouse position
-   // 3. Add anything the active state returns to the current state
+			ret.update = m_Panes[m_ActivePane].handleEvent(e);
+	}
+
    return ret;
 }
