@@ -1,32 +1,12 @@
-/*
-#include <GL_Includes.h>
-
-#include <SDL_image.h>
-#include <Menu.h>
-#include <Textures.h>
-#include <BaseEngine.h>
-
-#include <glm/gtx/transform.hpp>
-*/
-/*
-bool init(BaseEngine& engine);
-void close();
-
-//Apple demands OpenGL 3.3, and needs more modern shaders
-#ifdef __APPLE__
-const std::string vertexShaderSrc = "shaders/mac_vertShader.glsl";
-const std::string fragShaderSrc = "shaders/mac_fragShader.glsl";
-const int glMajor(3), glMinor(3);
-#else
-const std::string vertexShaderSrc = "shaders/vertShader.glsl";
-const std::string fragShaderSrc = "shaders/fragShader.glsl";
-const int glMajor(3), glMinor(0);
-#endif
-*/
-
+//main header
 #include <main.h>
+
+//OpenGL stuff
 #include <GL_Includes.h>
+
+//SDL stuff
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 
 //Why are these still global?
 SDL_Window * gWindow;
@@ -42,16 +22,17 @@ int main(int argc, char ** argv){
 		close();
 		return EXIT_FAILURE;
 	}
-
+	
 	evt = new SDL_Event();
+
 	HandleEvent:
-	while (SDL_PollEvent(evt)){
-		if (evt->type == SDL_QUIT)
-			goto Quit;
-		GameState evtState = engine.handleEvent(evt);
-		if (evtState == QUIT_GAME)
-			goto Quit;
-	}
+		while (SDL_PollEvent(evt)){
+			if (evt->type == SDL_QUIT)
+				goto Quit;
+			GameState evtState = engine.handleEvent(evt);
+			if (evtState == QUIT_GAME)
+				goto Quit;
+		}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	currentState = engine.iterate();
@@ -60,105 +41,14 @@ int main(int argc, char ** argv){
 	if (currentState != QUIT_GAME)
 		goto HandleEvent;
 
-
 	Quit:
-	if (evt) delete evt;
-   close();
-	cout << "goodbye" << endl;
-   return EXIT_SUCCESS;
-	/*
-
-	const int GAME_RESUME(1), GAME_QUIT(2);
-
-	SDL_Event * evt(new SDL_Event());//malloc(sizeof(SDL_Event))
-	//GameState GS(GAME_RESUME);
-	int GS(GAME_RESUME);
-
-	while (GS != GAME_QUIT){
-		//Clear OpenGL Buffers
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//If there's an event, handle it
-		if (SDL_PollEvent(evt)){
-			if (evt->type == SDL_QUIT)
-				break;
-//			engine.handleEvent(evt);
-		}
-		//Iterate Engine
-		GS = engine.iterate();
-		//Swap window Buffers
-		SDL_GL_SwapWindow(gWindow);
-	}		
-
-	
-	if (evt)
-		delete evt;	
-	close();
-
-	return EXIT_SUCCESS;
-*/
-/*
-			
-		}
-
+		if (evt) delete evt;
 		close();
-
+		cout << "goodbye" << endl;
 		return EXIT_SUCCESS;
-
-
-
-		bool inPlay(GAME_RESUME);
-
-
-
-
-
-		handleevent:
-		while (inPlay != GAME_QUIT)
-			while (SDL_PollEvent(&e){
-				if (e.type == SDL_QUIT)
-					goto iterate;
-			}
-			inplay = engine.iterate(e);
-			if (inPlay == GAME_QUIT)
-				goto draw;
-			while 
-			if (engine.iterate() == GAME_QUIT)
-				break;
-		}
-
-		
-
-		//Clear OpenGL Buffers
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//Depending on state
-		switch(s){
-			//Let the engine do its thing
-			case STATE_GAME:
-				engine.move();
-				engine.update();
-				engine.render();
-				break;
-			case STATE_MENU:
-				//Let the menu do its thing (MOVE SHADER INTO MENU ASAP)
-				menu.update();
-				engine.bindShader();
-				menu.render(glm::inverse(engine.getProjMat()));
-				engine.unBindShader();
-			case STATE_QUIT:
-			default:
-				break;
-		}
-
-		//Swap window buffers
-		SDL_GL_SwapWindow(gWindow);
-	}
-	//After loop, close up shop
-	close();
-
-	return EXIT_SUCCESS;*/
 }
 
+//This could be moved into the header without consquence
 bool init(BaseEngine& engine){
    //Init SDL Video
    if (SDL_Init( SDL_INIT_VIDEO ) < 0){
@@ -172,6 +62,12 @@ bool init(BaseEngine& engine){
 		printf("SDL_Image could not initialize! SDL_Image Error: %s\n", IMG_GetError());
       return false;
 	}
+
+	//Init SDL TTF
+	if (TTF_Init() < 0){
+      cout << "SDL_TTF could not initialize! Error: " << TTF_GetError() << endl;
+      return false;
+   }
 
    //Init SDL+OpenGL Context
    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, glMajor);
@@ -218,7 +114,7 @@ bool init(BaseEngine& engine){
    }
 
 	//OpenGL settings
-	glClearColor(1,.4,.4,1);
+	glClearColor(0.2,0.2,0.2,1);
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
@@ -227,7 +123,7 @@ bool init(BaseEngine& engine){
 
 	//These are legacy calls valid in OpenGL 3.0 only
 	#ifndef __APPLE__
-	glAlphaFunc(GL_GREATER, 0.9);
+	glAlphaFunc(GL_GREATER, 0.78);
 	glEnable(GL_ALPHA_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -242,5 +138,8 @@ bool init(BaseEngine& engine){
 void close(){
 	SDL_DestroyWindow(gWindow);
 	gWindow = NULL;
+	IMG_Quit();
+	TTF_Quit();
+	TTF_Quit();
 	SDL_Quit();
 }

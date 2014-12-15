@@ -71,7 +71,7 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 	level = unique_ptr<Level>(new Level(1, hud, shader, &dMap));
 
 	//Create the menu frame
-	menu = Menu(BoundRect(vec2(-0.5f), vec2(1)),0.15f, dMap["quad"].get()); 
+	menu = Menu(BoundRect(vec2(-0.75f), vec2(1.5)),0.15f, dMap["quad"].get()); 
 
 	float aspect = DEFAULT_SCREEN_DIM.x / DEFAULT_SCREEN_DIM.y;
 	mat4 proj = 
@@ -93,6 +93,24 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 
    //Rebind back buffer
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	if (!isFBOComplete())
+		return false;
+
+	//Add some panes to the menu (will be in XML soon enough
+	if (!menu.addPane("General"))
+		return false;
+
+	//This should all happen when the pane is added	
+	dMap["quad"]->addTex("General", fromTextString("yo"));
+
+	if (!menu.addPane("Tits"))
+		return false;
+
+	//This should all happen when the pane is added	
+	dMap["quad"]->addTex("Tits", fromTextString("ass"));
+
+	
 
 	m_Status = RESUME_GAME;
 
@@ -142,11 +160,7 @@ GameState BaseEngine::handleEvent(SDL_Event * e){
 			if (e->key.keysym.sym == SDLK_ESCAPE && m_Status != RESUME_MENU){
 				grabScreen();
 				m_Status = RESUME_MENU;
-				break;
-			}
-			if (m_Status == RESUME_MENU){
-				MenuState ms = menu.handleEvent(e);
-				m_Status = ms.gs;
+				return m_Status;
 			}
 		case SDL_KEYDOWN:
 			if (e->key.repeat == false)
@@ -166,6 +180,10 @@ GameState BaseEngine::handleEvent(SDL_Event * e){
 		default:
 			break;
 	}
+
+	if (m_Status == RESUME_MENU)
+		m_Status = menu.handleEvent(e).gs;
+
 	return m_Status;
 }
 
