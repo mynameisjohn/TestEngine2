@@ -51,6 +51,7 @@ public:
 	bool update();
 private:
    float value, minValue, maxValue, * handle;
+	BoundRect getHandleRect(), getLabelRect(), getRangeRect();
 };
 
 

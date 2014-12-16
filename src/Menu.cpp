@@ -37,6 +37,34 @@ Slider::Slider()
 Slider::Slider(string l, BoundRect r, Drawable * d, float v, float m, float M, float * h)
  : Control(l, r, d), value(v), minValue(m), maxValue(M), handle(h) { }
 
+
+//Don't
+const vec2 rangePos(.1,.6), labelPos(.05,.05), handleSize(.04,.12);
+const float labelHeight(0.25f), rangeHeight(.05);
+
+//I only need this one
+BoundRect Slider::getHandleRect(){
+	vec2 pos(colRect.getPos()), dim(colRect.getDim());
+	float rangeWidth = dim.x-2.f*rangePos.x*dim.x;
+	pos += vec2(lerp(0,rangeWidth,value),-rangeHeight*dim.y/2.f)+dim*(rangePos-handleSize/2.f);
+	dim = max(dim)*handleSize;
+	return BoundRect(pos,dim);
+}
+
+BoundRect Slider::getLabelRect(){
+	vec2 pos(colRect.getPos()), dim(colRect.getDim());
+	pos = pos+dim*labelPos;
+	dim = vec2(dim.x-2.f*labelPos.x*dim.x, dim.y*labelHeight);
+	return BoundRect(pos,dim);
+}
+
+BoundRect Slider::getRangeRect(){
+	vec2 pos(colRect.getPos()), dim(colRect.getDim());
+	pos = pos+dim*rangePos;
+	dim = vec2(dim.x-2.f*rangePos.x*dim.x, dim.y*rangeHeight);
+	return BoundRect(pos,dim);
+}
+
 Switch::Switch()
  : Control(), state(0), handle(nullptr) { }
 
@@ -54,12 +82,13 @@ bool Switch::update(){
 void Slider::draw(){
 	vec4 aColor(vec3(0.3),1), bColor(vec3(0.5),1), cColor(vec3(0.7),1), dColor(vec3(0.9),1);
 	vec3 off(0,0,-0.05);
-	vec2 c(0.01),b(.02,0.09),h(.04,.12);
-	float lWidth(0.04), bWidth(0.01);
 	BoundRect A(colRect);
-	BoundRect B(A.getPos()+c, {A.getDim().x-2*c.x,lWidth});
-	BoundRect C(A.getPos()+b, {A.getDim().x-2*b.x,bWidth});
-	BoundRect D(C.getPos()+vec2(lerp(0,C.getDim().x,value),0)-A.getDim()*h/2.f,max(A.getDim())*h);
+	BoundRect B(getLabelRect());//A.getPos()+c, {A.getDim().x-2*c.x,lWidth});
+	BoundRect C(getRangeRect());//A.getPos()+b, {A.getDim().x-2*b.x,bWidth});
+
+	//Put this one in memory
+	BoundRect D(getHandleRect());
+//C.getPos()+vec2(lerp(0,C.getDim().x,value),0)-A.getDim()*h/2.f,max(A.getDim())*h);
 
 	static float osc(0);
 	value = 0.5f*sin(osc)+0.5f;
@@ -75,6 +104,7 @@ void Slider::draw(){
 
 	//Draw Slider handle
 	drawRect(D, drPtr, 2.25f*off, dColor);
+
 }
 
 bool Slider::update(){
@@ -104,7 +134,12 @@ void Pane::draw(){
       (*cIt)->draw();
 }
 
+//Probably just send this normalized mouse position...
 bool Slider::handleEvent(SDL_Event * e){
+	if (e->type == SDL_MOUSEMOTION){
+		float x(e->motion.x), y(e->motion.y);
+		cout << vec2(x,y) << endl;
+	}
    //if event is mousedown, start tracking horizontal movement (make note of x pos, I guess)
    //if mouseUp, and if the mouse was already down (store this as toggle), reassign value
    //*handle = lerp(value, minValue, maxValue); //implying value [0,1]
@@ -168,19 +203,12 @@ void Menu::draw(){
    mat4 MV;
 
 	//Draw screen as background
-	MV = glm::translate(vec3(-1,-1,0) + BG_LAYER)*glm::scale(vec3(2,2,1));
-	qPtr->uploadMV(MV);
-	qPtr->uploadColor(white);
-	qPtr->draw("screen");
+	drawRect(BoundRect({-1,-1},{2,2}),qPtr,vec3(),vec4(1),"screen");
 
    //Draw base quad
-   S = vec3(m_Rect.getDim(),1);
-   T = vec3(m_Rect.getPos(),0);
-   MV = glm::translate(T + BASE_LAYER)*glm::scale(S);
-   qPtr->uploadMV(MV);
-   qPtr->uploadColor(baseColor);
-   qPtr->draw();
+	drawRect(m_Rect, qPtr, BASE_LAYER, baseColor);
 
+	//Clean this up later
    //Draw Pane tabs
    S = vec3(m_Rect.getDim().x/((float)m_Panes.size()), m_PaneHeight, 1);
 	float shift(0);
