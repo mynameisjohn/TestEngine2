@@ -15,6 +15,7 @@ public:
 	float top();
 	vec2 getPos();
 	vec2 getDim();
+	vec2 center();
 protected:
 	vec2 mPos;
 	vec2 mDim;

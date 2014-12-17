@@ -35,7 +35,7 @@ Slider::Slider()
  : Control(), handle(nullptr) { }
 
 Slider::Slider(string l, BoundRect r, Drawable * d, float v, float m, float M, float * h)
- : Control(l, r, d), value(v), minValue(m), maxValue(M), handle(h) { }
+ : Control(l, r, d), value(remap(v,m,M,0.f,1.f)), minValue(m), maxValue(M), handle(h), grabbed(false) { }
 
 
 //Don't
@@ -66,15 +66,22 @@ BoundRect Slider::getRangeRect(){
 }
 
 Switch::Switch()
- : Control(), state(0), handle(nullptr) { }
+ : Control(), handle(nullptr) { }
 
-Switch::Switch(string l, BoundRect r, Drawable * d, vector<string> o, uint32_t s, uint32_t * h)
- : Control(l, r, d), options(o), state(s), handle(h) { }
+Switch::Switch(string l, BoundRect r, Drawable * d, unordered_map<string, uint32_t> o, uint32_t * h,
+string a)
+ : Control(l, r, d), active(a), options(o), handle(h){ 
+	
+}
 
 void Switch::draw(){
+	vec4 white(1), baseColor(vec3(0.3),1), color(vec3(),1);	
+
+	drawRect(colRect, drPtr, CONTROL_LAYER, baseColor);
 }
 
 bool Switch::update(){
+
 	return false;
 }
 
@@ -88,11 +95,6 @@ void Slider::draw(){
 
 	//Put this one in memory
 	BoundRect D(getHandleRect());
-//C.getPos()+vec2(lerp(0,C.getDim().x,value),0)-A.getDim()*h/2.f,max(A.getDim())*h);
-
-	static float osc(0);
-	value = 0.5f*sin(osc)+0.5f;
-	osc += 0.01f;
 
 	//Draw base rectangle
 	drawRect(A, drPtr, 1.5f*off, aColor);
@@ -134,6 +136,40 @@ void Pane::draw(){
       (*cIt)->draw();
 }
 
+//I should make a BoundCircle class...
+bool Slider::handleEvent(vec2 mousePos, bool lmbDown){
+	const vec2 mouseDim(0.01);
+	BoundRect hRect(getHandleRect());
+	BoundRect mouseRect(mousePos-mouseDim/2.f,mouseDim);
+
+	//if grabbed, find diff between mouseRect.center and hRect.center
+	//remap this difference from between rangeRect.dim.x to 0,1
+	//this is the new value
+
+	if (!grabbed){
+		if (hRect.collidesWith(mouseRect) && lmbDown){
+			grabbed = true;
+		}
+	}
+	else
+		grabbed = lmbDown;
+	
+//	if (grabbed && !lmbDown)
+//		grabbed = false;
+//	else
+//		grabbed = (!grabbed && hRect.collidesWith(mouseRect) && lmbDown);
+
+	if (grabbed){
+		BoundRect rangeRect(getRangeRect());
+		//map mousePos.x into range space
+		float dx_range = mouseRect.center().x - hRect.center().x;
+		float dx_value = remap(dx_range, 0.f, rangeRect.getDim().x, 0.f, 1.f);
+		value = clamp(value+dx_value, 0, 1);
+	}
+
+	return false;
+}
+
 //Probably just send this normalized mouse position...
 bool Slider::handleEvent(SDL_Event * e){
 	if (e->type == SDL_MOUSEMOTION){
@@ -146,7 +182,16 @@ bool Slider::handleEvent(SDL_Event * e){
 	return true;
 }
 
+bool Switch::handleEvent(vec2 mousePos, bool lmbDown){
+
+	return false;	
+}
+
 bool Switch::handleEvent(SDL_Event * e){
+	if (e->type == SDL_MOUSEMOTION){
+		float x(e->motion.x), y(e->motion.y);
+		cout << vec4(x,y,7,8) << endl;
+	}
    //check collision with all the switches (divide up the dim by the number of options, make quads)
    //if one was mouse'd down and is mouse'd (') up again, make that the current state
    //state = idxOf(options, selected);
@@ -172,6 +217,15 @@ bool Pane::addControl(Control& c){
 //Return string label of Pane
 string Pane::getLabel(){
    return m_Label;
+}
+
+bool Pane::handleEvent(vec2 mousePos, bool lmbDown){
+	bool update(false);
+   vector<unique_ptr<Control> >::iterator cIt;
+   for (cIt=m_Controls.begin(); cIt!=m_Controls.end(); cIt++)
+      if ((*cIt)->handleEvent(mousePos, lmbDown))
+         update = true;
+   return update;
 }
 
 bool Pane::handleEvent(SDL_Event * e){
@@ -228,6 +282,7 @@ void Menu::draw(){
 		it->second.draw();
 }
 
+//Why all of them?
 bool Menu::update(){
 	bool ret(false);
 	unordered_map<string, Pane>::iterator it;
@@ -257,6 +312,15 @@ Pane * Menu::operator[](string idx){
 	if (it == m_Panes.end())
 		return nullptr;
 	return &(m_Panes[idx]);
+}
+
+MenuState Menu::handleEvent(vec2 mousePos, bool lmbDown){
+	MenuState ret = { RESUME_MENU, false };
+
+	if (m_Panes.find(m_ActivePane) != m_Panes.end())
+         ret.update = m_Panes[m_ActivePane].handleEvent(mousePos, lmbDown);
+
+	return ret;
 }
 
 //Handle event, return a set indicating what's happened to the menu items

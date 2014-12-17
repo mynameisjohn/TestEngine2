@@ -39,6 +39,7 @@ GameState BaseEngine::iterate(){
 		case RESUME_MENU:
 			glUniformMatrix4fv(shader.getProjHandle(), 1, GL_FALSE, glm::value_ptr(I));
 			menu.update();
+			cout << volume << endl;
 			menu.draw();
 			break;
 		case QUIT_GAME:
@@ -98,9 +99,16 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 		  menu.addPane("Audio") &&
 		  menu.addPane("Controls")) == false)
 		return false;
+
+	//What a pile
+	const float minVol(0), maxVol(100), defVol(75);
+	volume = defVol;
+	Slider sl("slider",BoundRect(vec2(0.3),vec2(0.3,0.15)),dMap["quad"].get(),defVol,minVol,maxVol,&volume);
+	Switch sw("switch",BoundRect(vec2(-0.3),vec2(0.3,0.15)),dMap["quad"].get(),
+		{{"zero", 0},{"one", 1}}, nullptr, "one");
 	
-	Slider s("switch",BoundRect(vec2(0.3),vec2(0.3,0.15)),dMap["quad"].get(),0.5,0,1,nullptr);
-	menu["General"]->addControl(s);
+	menu["General"]->addControl(sl);
+	menu["General"]->addControl(sw);
 
 	m_Status = RESUME_GAME;
 
@@ -170,8 +178,14 @@ GameState BaseEngine::handleEvent(SDL_Event * e){
 			break;
 	}
 
-	if (m_Status == RESUME_MENU)
-		m_Status = menu.handleEvent(e).gs;
+	if (m_Status == RESUME_MENU){
+		//This may be done twice...but it's not really that expensive
+		const vec2 m1(0,1), m2(1,0), m3(-1,-1), m4(1,1);
+		int x, y;
+		bool lmbDown = (bool)((SDL_GetMouseState(&x, &y)) & SDL_BUTTON(SDL_BUTTON_LEFT));
+		vec2 sp = remap(vec2(x,y)/getScreenDim(), m1, m2, m3, m4);
+		m_Status = menu.handleEvent(sp, lmbDown).gs;
+	}
 
 	return m_Status;
 }

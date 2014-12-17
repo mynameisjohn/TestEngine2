@@ -32,6 +32,7 @@ public:
    Control(string, BoundRect, Drawable *);
    virtual void draw() = 0;
    virtual bool handleEvent(SDL_Event * e) = 0;
+   virtual bool handleEvent(vec2 mousePos, bool rmbDown) = 0;
 	virtual bool update() = 0;
 	string getLabel();
 	BoundRect getRect();
@@ -48,23 +49,30 @@ public:
    Slider(string l, BoundRect rect, Drawable * drPtr, float v, float m, float M, float * h);
    void draw();
    bool handleEvent(SDL_Event * e);
+   bool handleEvent(vec2 mousePos, bool rmbDown);
 	bool update();
 private:
    float value, minValue, maxValue, * handle;
 	BoundRect getHandleRect(), getLabelRect(), getRangeRect();
+	bool grabbed;
+	float x0,x1;;
 };
 
 
 class Switch : public Control{
 public:
    Switch();
-   Switch(string l, BoundRect rect, Drawable * d, vector<string> o, uint32_t s, uint32_t * h);
+   Switch(string l, BoundRect rect, Drawable * d,unordered_map<string, uint32_t> o, uint32_t * h, 
+																															string a="");
    void draw();
    bool handleEvent(SDL_Event * e);
+   bool handleEvent(vec2 mousePos, bool rmbDown);
 	bool update();
 private:
-   vector<string> options;
-   uint32_t state, * handle;
+	string active;
+	unordered_map<string, uint32_t> options;
+//   vector<string> options;
+   uint32_t * handle;
 };
 
 
@@ -74,6 +82,7 @@ public:
 	void draw();
 	bool addControl(Control& c);
 	bool handleEvent(SDL_Event * e);
+   bool handleEvent(vec2 mousePos, bool rmbDown);
 	bool update();
 	string getLabel();
 private:
@@ -93,6 +102,7 @@ public:
 	
 	Pane * operator[](string idx);
 	MenuState handleEvent(SDL_Event * e);
+	MenuState handleEvent(vec2 mousePos, bool rmbDown);
 private:
 	BoundRect m_Rect;
 	float m_PaneHeight;

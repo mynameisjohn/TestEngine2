@@ -43,3 +43,7 @@ vec2 glmRect::getPos(){
 vec2 glmRect::getDim(){
 	return mDim;
 }
+
+vec2 glmRect::center(){
+	return mPos+0.5f*mDim;
+}

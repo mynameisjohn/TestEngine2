@@ -41,6 +41,7 @@ private:
 	bool motionHandled;
 	void handleMotion(float x, float y);
 	unordered_map<string, unique_ptr<Drawable> > dMap;
+	float volume;
 };
 
 int keyCode(SDL_Event& e);
