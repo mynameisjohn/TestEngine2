@@ -39,7 +39,6 @@ GameState BaseEngine::iterate(){
 		case RESUME_MENU:
 			glUniformMatrix4fv(shader.getProjHandle(), 1, GL_FALSE, glm::value_ptr(I));
 			menu.update();
-			cout << volume << endl;
 			menu.draw();
 			break;
 		case QUIT_GAME:
@@ -89,7 +88,7 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 
    //Rebind back buffer
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+ 
 	if (!isFBOComplete())
 		return false;
 
@@ -154,9 +153,13 @@ GameState BaseEngine::handleEvent(SDL_Event * e){
 
 	switch (e->type){
 		case SDL_KEYUP:
-			if (e->key.keysym.sym == SDLK_ESCAPE && m_Status != RESUME_MENU){
-				grabScreen();
-				m_Status = RESUME_MENU;
+			if (e->key.keysym.sym == SDLK_ESCAPE){
+				if (m_Status == RESUME_MENU)
+					m_Status = RESUME_GAME;
+				else {
+					grabScreen();
+					m_Status = RESUME_MENU;
+				}
 				return m_Status;
 			}
 		case SDL_KEYDOWN:
@@ -178,6 +181,7 @@ GameState BaseEngine::handleEvent(SDL_Event * e){
 			break;
 	}
 
+	//Rather glaring bug here: if the mouse was already down it still counts. Who cares?
 	if (m_Status == RESUME_MENU){
 		//This may be done twice...but it's not really that expensive
 		const vec2 m1(0,1), m2(1,0), m3(-1,-1), m4(1,1);

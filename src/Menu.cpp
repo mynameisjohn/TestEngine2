@@ -74,10 +74,27 @@ string a)
 	
 }
 
+BoundRect Switch::getOptionRect(int i){
+	const vec2 optionsPos(0.1,0.4);
+   const float height(0.35);
+   float width = colRect.getDim().x*(1.f-2.f*optionsPos.x);
+	float off(i), N(options.size());
+	vec2 dim(width/N, height*colRect.getDim().y);
+	vec2 pos(colRect.getPos()+optionsPos*colRect.getDim()+vec2(off*width/N, 0));
+
+	return BoundRect(pos,dim);
+}
+
 void Switch::draw(){
 	vec4 white(1), baseColor(vec3(0.3),1), color(vec3(),1);	
 
 	drawRect(colRect, drPtr, CONTROL_LAYER, baseColor);
+	
+	int i(0);
+	unordered_map<string, uint32_t>::iterator it;
+	for (it=options.begin(); it!=options.end(); it++)
+		drawRect(getOptionRect(i++), drPtr, vec3(0,0,-.1)+CONTROL_LAYER, 
+			active == it->first ? vec4(1,0.5,0.5,1) : white);
 }
 
 bool Switch::update(){
@@ -136,14 +153,18 @@ void Pane::draw(){
       (*cIt)->draw();
 }
 
+BoundRect getMouseRect(vec2 mousePos){
+	const vec2 mouseDim(0.01);
+	return BoundRect(mousePos-mouseDim/2.f,mouseDim);
+}
+
 //I should make a BoundCircle class...
 bool Slider::handleEvent(vec2 mousePos, bool lmbDown){
-	const vec2 mouseDim(0.01);
 	BoundRect hRect(getHandleRect());
-	BoundRect mouseRect(mousePos-mouseDim/2.f,mouseDim);
+	BoundRect mouseRect(getMouseRect(mousePos));//mousePos-mouseDim/2.f,mouseDim);
 
 	//if grabbed, find diff between mouseRect.center and hRect.center
-	//remap this difference from between rangeRect.dim.x to 0,1
+	//remap this difference from between 0, rangeRect.dim.x to 0,1
 	//this is the new value
 
 	if (!grabbed){
@@ -154,14 +175,8 @@ bool Slider::handleEvent(vec2 mousePos, bool lmbDown){
 	else
 		grabbed = lmbDown;
 	
-//	if (grabbed && !lmbDown)
-//		grabbed = false;
-//	else
-//		grabbed = (!grabbed && hRect.collidesWith(mouseRect) && lmbDown);
-
 	if (grabbed){
 		BoundRect rangeRect(getRangeRect());
-		//map mousePos.x into range space
 		float dx_range = mouseRect.center().x - hRect.center().x;
 		float dx_value = remap(dx_range, 0.f, rangeRect.getDim().x, 0.f, 1.f);
 		value = clamp(value+dx_value, 0, 1);
@@ -169,7 +184,7 @@ bool Slider::handleEvent(vec2 mousePos, bool lmbDown){
 
 	return false;
 }
-
+/*
 //Probably just send this normalized mouse position...
 bool Slider::handleEvent(SDL_Event * e){
 	if (e->type == SDL_MOUSEMOTION){
@@ -178,15 +193,28 @@ bool Slider::handleEvent(SDL_Event * e){
 	}
    //if event is mousedown, start tracking horizontal movement (make note of x pos, I guess)
    //if mouseUp, and if the mouse was already down (store this as toggle), reassign value
-   //*handle = lerp(value, minValue, maxValue); //implying value [0,1]
+   //handle = lerp(value, minValue, maxValue); //implying value [0,1]
 	return true;
 }
-
+*/
 bool Switch::handleEvent(vec2 mousePos, bool lmbDown){
+	BoundRect mouseRect(getMouseRect(mousePos));
+
+	int i(0);
+   unordered_map<string, uint32_t>::iterator it;
+   for (it=options.begin(); it!=options.end(); it++){
+		BoundRect optionRect(getOptionRect(i++));
+		if (mouseRect.collidesWith(optionRect) && lmbDown){
+//			*handle = it->second;
+			active = it->first;
+			cout << it->second << endl;
+			return true;
+		}
+	}
 
 	return false;	
 }
-
+/*
 bool Switch::handleEvent(SDL_Event * e){
 	if (e->type == SDL_MOUSEMOTION){
 		float x(e->motion.x), y(e->motion.y);
@@ -195,10 +223,10 @@ bool Switch::handleEvent(SDL_Event * e){
    //check collision with all the switches (divide up the dim by the number of options, make quads)
    //if one was mouse'd down and is mouse'd (') up again, make that the current state
    //state = idxOf(options, selected);
-   //*handle should probably be an enum (or passed via constructor) //map<uint32_t, string>;
+   //handle should probably be an enum (or passed via constructor) //map<uint32_t, string>;
 	return true;
 }
-
+*/
 //Function for adding controls; I need unique ones for now
 bool Pane::addControl(Control& c){
 	if (m_Controls.size() > PANE_MAX_CONTROLS)
@@ -227,7 +255,7 @@ bool Pane::handleEvent(vec2 mousePos, bool lmbDown){
          update = true;
    return update;
 }
-
+/*
 bool Pane::handleEvent(SDL_Event * e){
    //Should I check if the mouse collides with a control?
    bool update(false);
@@ -237,7 +265,7 @@ bool Pane::handleEvent(SDL_Event * e){
          update = true;
    return update;
 }
-
+*/
 //Main constructor
 Menu::Menu(BoundRect r, float pH, Drawable * d)
       :  m_Rect(r), 
@@ -245,14 +273,19 @@ Menu::Menu(BoundRect r, float pH, Drawable * d)
 			qPtr(d), 
 			m_FBO(0), 
 			m_Tex(0),
-			m_ActivePane("")
+			m_ActivePane(0)
 {}
 
+BoundRect Menu::getPaneRect(int i){
+	float shift(i);
+	vec2 dim(m_Rect.getDim().x/((float)m_Panes.size()), m_PaneHeight);
+	vec2 pos(m_Rect.left()+shift*dim.x, m_Rect.top());
+	return BoundRect(pos, dim);
+}
 
 //Draw the menu and its components
 void Menu::draw(){
    //Scale, translation, active/inactive colors, model view matrix
-   vec3 S, T;
    vec4 white(1), activeColor(vec3(0.1),0.95), inactiveColor(vec3(0.5),0.95), baseColor(vec3(0.1),0.95);
    mat4 MV;
 
@@ -262,67 +295,102 @@ void Menu::draw(){
    //Draw base quad
 	drawRect(m_Rect, qPtr, BASE_LAYER, baseColor);
 
+	for (int i=0; i<m_Panes.size(); i++)
+		drawRect(getPaneRect(i), qPtr, PANE_LAYER, 
+			(i == m_ActivePane ? activeColor : inactiveColor), m_Panes[i].getLabel());
+	
+/*
+	//WE NEED A DIFFERENT DATA STRUCTURE (so I can order the panes my own way)
 	//Clean this up later
    //Draw Pane tabs
-   S = vec3(m_Rect.getDim().x/((float)m_Panes.size()), m_PaneHeight, 1);
+	vec2 dim(m_Rect.getDim().x/((float)m_Panes.size()), m_PaneHeight);
 	float shift(0);
 	unordered_map<string, Pane>::iterator it;
 	for (it = m_Panes.begin(); it!=m_Panes.end(); it++){
-      T = vec3(m_Rect.left()+shift*S.x, m_Rect.top(), 0) + PANE_LAYER;
-      MV = glm::translate(T)*glm::scale(S);
-      qPtr->uploadMV(MV);
-      qPtr->uploadColor(it->first == m_ActivePane ? activeColor : inactiveColor);
-      qPtr->draw(it->second.getLabel());
+		BoundRect pRect(vec2(m_Rect.left()+shift*dim.x, m_Rect.top()), dim);
+		drawRect(pRect, qPtr, PANE_LAYER, (it->first == m_ActivePane ? activeColor : inactiveColor),
+			it->second.getLabel());
 		shift += 1.f;
    }
-
+*/
+	m_Panes[clamp(m_ActivePane, 0, m_Panes.size()-1)].draw();
+/*
    //Draw active pane
 	it = m_Panes.find(m_ActivePane);
 	if (it != m_Panes.end())
-		it->second.draw();
+		it->second.draw();*/
 }
 
 //Why all of them?
 bool Menu::update(){
 	bool ret(false);
+	vector<Pane>::iterator it;
+	for (it=m_Panes.begin(); it!=m_Panes.end(); it++)
+		if (it->update())
+			ret = true;/*
 	unordered_map<string, Pane>::iterator it;
 	for (it = m_Panes.begin(); it!=m_Panes.end(); it++)
 		if (it->second.update())
-			ret = true;
+			ret = true;*/
 	return ret;
 }
 
 //Add a pane with string label l (if possible)
 bool Menu::addPane(string l){
-	if (m_Panes.size() > MENU_MAX_PANES || m_Panes.find(l) != m_Panes.end())
+	if (m_Panes.size() > MENU_MAX_PANES)// || m_Panes.find(l) != m_Panes.end())
 		return false;
+
+	vector<Pane>::iterator it;
+	for (it=m_Panes.begin(); it!=m_Panes.end(); it++)
+		if (it->getLabel() == l)
+			return false;
+
+	m_Panes.push_back(l);
+	qPtr->addTex(l, fromTextString(l));
+/*
 
 	m_Panes.emplace(l, l);
 	qPtr->addTex(l, fromTextString(l));
 
 	if (m_Panes.find(m_ActivePane) == m_Panes.end())
 		m_ActivePane = l;
-
+*/
 	return true;
 }
 
 //Get a pointer to the pane at label idx (returns null if non existent)
 Pane * Menu::operator[](string idx){
+	vector<Pane>::iterator it;
+	for (it=m_Panes.begin(); it!=m_Panes.end(); it++)
+		if (it->getLabel() == idx)
+			return &(*it);
+	return nullptr;
+/*
 	unordered_map<string, Pane>::iterator it(m_Panes.find(idx));
 	if (it == m_Panes.end())
 		return nullptr;
 	return &(m_Panes[idx]);
+*/
 }
 
 MenuState Menu::handleEvent(vec2 mousePos, bool lmbDown){
 	MenuState ret = { RESUME_MENU, false };
+	BoundRect mouseRect(getMouseRect(mousePos));
 
+	for (int i=0; i<m_Panes.size(); i++)
+		if (mouseRect.collidesWith(getPaneRect(i)) && lmbDown)
+			m_ActivePane = i;
+		//We could probably just return here
+
+
+	ret.update = m_Panes[clamp(m_ActivePane, 0, m_Panes.size()-1)].handleEvent(mousePos, lmbDown);
+/*
 	if (m_Panes.find(m_ActivePane) != m_Panes.end())
          ret.update = m_Panes[m_ActivePane].handleEvent(mousePos, lmbDown);
-
+*/
 	return ret;
 }
-
+/*
 //Handle event, return a set indicating what's happened to the menu items
 MenuState Menu::handleEvent(SDL_Event * e){
    MenuState ret = { RESUME_MENU, false };
@@ -339,10 +407,11 @@ MenuState Menu::handleEvent(SDL_Event * e){
 				//Here we'd have to check if the player has clicked a new active pane
 				//won't work with the unordered_map setup
 			default: break;
-		}	
+		}
 		if (m_Panes.find(m_ActivePane) != m_Panes.end())
 			ret.update = m_Panes[m_ActivePane].handleEvent(e);
 	}
 
    return ret;
 }
+*/
