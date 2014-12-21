@@ -93,7 +93,6 @@ public:
 	bool update();
 	uint32_t * getFBO(){ return &m_FBO; }
 	uint32_t * getTex(){ return &m_Tex; }
-	
 	Pane * operator[](string idx);
 	MenuState handleEvent(vec2 mousePos, bool rmbDown);
 private:
@@ -102,7 +101,7 @@ private:
 	Drawable * qPtr;
 	uint32_t m_FBO, m_Tex;
 	int m_ActivePane;//string m_ActivePane;
-	vector<Pane> m_Panes;
+	vector<unique_ptr<Pane> > m_Panes;
 	BoundRect getPaneRect(int i);//IMPLEMENT THIS
 };
 

@@ -302,7 +302,7 @@ void Menu::draw(){
 
 	for (int i=0; i<m_Panes.size(); i++)
 		drawRect(getPaneRect(i), qPtr, PANE_LAYER, 
-			(i == m_ActivePane ? activeColor : inactiveColor), m_Panes[i].getLabel());
+			(i == m_ActivePane ? activeColor : inactiveColor), m_Panes[i]->getLabel());
 	
 /*
 	//WE NEED A DIFFERENT DATA STRUCTURE (so I can order the panes my own way)
@@ -318,7 +318,7 @@ void Menu::draw(){
 		shift += 1.f;
    }
 */
-	m_Panes[clamp(m_ActivePane, 0, m_Panes.size()-1)].draw();
+	m_Panes[clamp(m_ActivePane, 0, m_Panes.size()-1)]->draw();
 /*
    //Draw active pane
 	it = m_Panes.find(m_ActivePane);
@@ -329,9 +329,9 @@ void Menu::draw(){
 //Why all of them?
 bool Menu::update(){
 	bool ret(false);
-	vector<Pane>::iterator it;
+	vector<unique_ptr<Pane> >::iterator it;
 	for (it=m_Panes.begin(); it!=m_Panes.end(); it++)
-		if (it->update())
+		if ((*it)->update())
 			ret = true;/*
 	unordered_map<string, Pane>::iterator it;
 	for (it = m_Panes.begin(); it!=m_Panes.end(); it++)
@@ -345,12 +345,12 @@ bool Menu::addPane(string l){
 	if (m_Panes.size() > MENU_MAX_PANES)// || m_Panes.find(l) != m_Panes.end())
 		return false;
 
-	vector<Pane>::iterator it;
+	vector<unique_ptr<Pane> >::iterator it;
 	for (it=m_Panes.begin(); it!=m_Panes.end(); it++)
-		if (it->getLabel() == l)
+		if ((*it)->getLabel() == l)
 			return false;
 
-	m_Panes.push_back(l);
+	m_Panes.emplace_back(new Pane(l));
 	vec2 border(m_Rect.getDim().x/2.f, 0.1f);
 	qPtr->addTex(l, fromTextString(l, 100, vec3(), vec3(1), border));
 /*
@@ -366,10 +366,10 @@ bool Menu::addPane(string l){
 
 //Get a pointer to the pane at label idx (returns null if non existent)
 Pane * Menu::operator[](string idx){
-	vector<Pane>::iterator it;
+	vector<unique_ptr<Pane> >::iterator it;
 	for (it=m_Panes.begin(); it!=m_Panes.end(); it++)
-		if (it->getLabel() == idx)
-			return &(*it);
+		if ((*it)->getLabel() == idx)
+			return it->get();
 	return nullptr;
 /*
 	unordered_map<string, Pane>::iterator it(m_Panes.find(idx));
@@ -389,7 +389,7 @@ MenuState Menu::handleEvent(vec2 mousePos, bool lmbDown){
 		//We could probably just return here
 
 
-	ret.update = m_Panes[clamp(m_ActivePane, 0, m_Panes.size()-1)].handleEvent(mousePos, lmbDown);
+	ret.update = m_Panes[clamp(m_ActivePane, 0, m_Panes.size()-1)]->handleEvent(mousePos, lmbDown);
 /*
 	if (m_Panes.find(m_ActivePane) != m_Panes.end())
          ret.update = m_Panes[m_ActivePane].handleEvent(mousePos, lmbDown);
