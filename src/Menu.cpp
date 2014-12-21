@@ -20,8 +20,12 @@ void drawRect(BoundRect br, Drawable * drPtr, vec3 offset, vec4 color, string te
 Control::Control()
  : drPtr(nullptr) { }
 
+//Font and border should be a function of string length
 Control::Control(string l, BoundRect r, Drawable * d)
- : label(l), colRect(r), drPtr(d) { }
+ : label(l), colRect(r), drPtr(d){
+	vec2 border(0.5f, 0.1f);
+	drPtr->addTex(label, fromTextString(label, 100, vec3(), vec3(1), border));
+}
 
 string Control::getLabel(){
 	return label;
@@ -85,6 +89,7 @@ BoundRect Switch::getOptionRect(int i){
 	return BoundRect(pos,dim);
 }
 
+//Need a label rect
 void Switch::draw(){
 	vec4 white(1), baseColor(vec3(0.3),1), color(vec3(),1);	
 
@@ -116,7 +121,7 @@ void Slider::draw(){
 	//Draw base rectangle
 	drawRect(A, drPtr, 1.5f*off, aColor);
 	//Draw label
-	drawRect(B, drPtr, 1.755f*off, bColor);
+	drawRect(B, drPtr, 1.755f*off, bColor, label);
 
 	//Draw Slider line
 	drawRect(C, drPtr, 2.f*off, cColor);
@@ -207,7 +212,7 @@ bool Switch::handleEvent(vec2 mousePos, bool lmbDown){
 		if (mouseRect.collidesWith(optionRect) && lmbDown){
 //			*handle = it->second;
 			active = it->first;
-			cout << it->second << endl;
+			//cout << it->second << endl;
 			return true;
 		}
 	}
@@ -346,7 +351,8 @@ bool Menu::addPane(string l){
 			return false;
 
 	m_Panes.push_back(l);
-	qPtr->addTex(l, fromTextString(l));
+	vec2 border(m_Rect.getDim().x/2.f, 0.1f);
+	qPtr->addTex(l, fromTextString(l, 100, vec3(), vec3(1), border));
 /*
 
 	m_Panes.emplace(l, l);
