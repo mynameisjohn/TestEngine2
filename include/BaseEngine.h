@@ -36,7 +36,7 @@ private:
 	Camera cam;
 	JShader shader;
 	Hud hud;
-	Menu menu;
+	unique_ptr<Menu> menu;
 	unique_ptr<Level> level;
 	bool motionHandled;
 	void handleMotion(float x, float y);

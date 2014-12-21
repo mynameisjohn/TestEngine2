@@ -38,8 +38,8 @@ GameState BaseEngine::iterate(){
 			break;
 		case RESUME_MENU:
 			glUniformMatrix4fv(shader.getProjHandle(), 1, GL_FALSE, glm::value_ptr(I));
-			menu.update();
-			menu.draw();
+			menu->update();
+			menu->draw();
 			break;
 		case QUIT_GAME:
 		default:
@@ -66,7 +66,7 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 
 	//Create the menu frame
 	vec2 menuDim(1.5);
-	menu = Menu(BoundRect(-0.5f*menuDim, menuDim),0.15f, dMap["quad"].get()); 
+	menu = unique_ptr<Menu>(new Menu(BoundRect(-0.5f*menuDim, menuDim),0.15f, dMap["quad"].get())); 
 
 	float aspect = DEFAULT_SCREEN_DIM.x / DEFAULT_SCREEN_DIM.y;
 	mat4 proj = 
@@ -78,13 +78,13 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 
 	vec2 screenDim(cam.getScreenDim());
 	//Generate blank texture, add it to drawable
-   *(menu.getTex()) = initTexture(NULL, screenDim.x/DS, screenDim.y/DS);
-   dMap["quad"].get()->addTex("screen", *(menu.getTex()));
+   *(menu->getTex()) = initTexture(NULL, screenDim.x/DS, screenDim.y/DS);
+   dMap["quad"].get()->addTex("screen", *(menu->getTex()));
 
    //Generate Frame buffer and attach texture
-   glGenFramebuffers(1, menu.getFBO());
-   glBindFramebuffer(GL_FRAMEBUFFER, *(menu.getFBO()));
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *(menu.getTex()), 0);   
+   glGenFramebuffers(1, menu->getFBO());
+   glBindFramebuffer(GL_FRAMEBUFFER, *(menu->getFBO()));
+   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *(menu->getTex()), 0);   
 
    //Rebind back buffer
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -93,10 +93,10 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 		return false;
 
 	//Add some panes to the menu (will be in XML soon enough
-	if ((menu.addPane("General") &&
-		  menu.addPane("Video") &&
-		  menu.addPane("Audio") &&
-		  menu.addPane("Controls")) == false)
+	if ((menu->addPane("General") &&
+		  menu->addPane("Video") &&
+		  menu->addPane("Audio") &&
+		  menu->addPane("Controls")) == false)
 		return false;
 
 	//What a pile
@@ -106,8 +106,8 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 	Switch sw("switch",BoundRect(vec2(-0.3),vec2(0.3,0.15)),dMap["quad"].get(),
 		{{"zero", 0},{"one", 1}}, nullptr, "one");
 	
-	menu["General"]->addControl(sl);
-	menu["General"]->addControl(sw);
+	(*menu)["General"]->addControl(sl);
+	(*menu)["General"]->addControl(sw);
 
 	m_Status = RESUME_GAME;
 
@@ -117,7 +117,7 @@ bool BaseEngine::init(string vertShaderSrc, string fragShaderSrc){
 bool BaseEngine::grabScreen(){
    //Bind Read and Draw buffers for Blit
    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, *(menu.getFBO()));
+   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, *(menu->getFBO()));
    //Blit with downsampling for fun
 	vec2 screenDim(cam.getScreenDim());
    glBlitFramebuffer(0, 0, screenDim.x, screenDim.y,
@@ -188,7 +188,7 @@ GameState BaseEngine::handleEvent(SDL_Event * e){
 		int x, y;
 		bool lmbDown = (bool)((SDL_GetMouseState(&x, &y)) & SDL_BUTTON(SDL_BUTTON_LEFT));
 		vec2 sp = remap(vec2(x,y)/getScreenDim(), m1, m2, m3, m4);
-		m_Status = menu.handleEvent(sp, lmbDown).gs;
+		m_Status = menu->handleEvent(sp, lmbDown).gs;
 	}
 
 	return m_Status;
